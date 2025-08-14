@@ -85,12 +85,8 @@ build_ppi_network <- function(proteins = NULL,
 
   # IntAct database (simplified - would need actual API calls)
   if ("IntAct" %in% data_sources) {
-    if (!requireNamespace("OmnipathR", quietly = TRUE)) {
-      warning("OmnipathR package not available. Skipping IntAct database.")
-    } else {
-      intact_net <- .get_intact_ppi(proteins, species)
-      if (!is.null(intact_net)) networks$IntAct <- intact_net
-    }
+    intact_net <- .get_intact_ppi(proteins, species, min_confidence)
+    if (!is.null(intact_net)) networks$IntAct <- intact_net
   }
 
   # InBioMap database (simplified - would need actual API calls)
@@ -115,7 +111,7 @@ build_ppi_network <- function(proteins = NULL,
   # If proteins provided, extract subnetwork containing these proteins
   if (!is.null(proteins)) {
     # Ensure proteins are in the network
-    available_proteins <- V(combined_net)$name
+    available_proteins <- igraph::V(combined_net)$name
     valid_proteins <- proteins[proteins %in% available_proteins]
 
     if (length(valid_proteins) > 0) {
@@ -170,7 +166,10 @@ build_ppi_network <- function(proteins = NULL,
       # Add edge attributes
       igraph::E(net)$weight <- all_interactions$combined_score
       igraph::E(net)$source <- "STRING"
-
+      cat("STRING DB Network Summary:\n")
+      cat("Nodes:", length(igraph::V(net)), "\n")
+      cat("Edges:", length(igraph::E(net)), "\n")
+      cat("Average degree:", mean(igraph::degree(net)), "\n")
       return(net)
     },
     error = function(e) {
@@ -185,17 +184,67 @@ build_ppi_network <- function(proteins = NULL,
 .get_biogrid_ppi <- function(proteins, species) {
   # This is a placeholder - in practice would use BioGRID API
   # For now, return NULL to indicate not implemented
-  message("BioGRID integration not yet implemented - returning NULL")
+  message("BioGRID database was downloaded from https://downloads.thebiogrid.org/File/BioGRID/Release-Archive/BIOGRID-4.4.248/BIOGRID-ALL-4.4.248.tab3.zip")
   return(NULL)
 }
 
-#' Get IntAct PPI (placeholder)
+#' Get IntAct PPI
 #' @noRd
-.get_intact_ppi <- function(proteins, species) {
-  # This is a placeholder - in practice would use IntAct API
-  # For now, return NULL to indicate not implemented
-  message("IntAct integration not yet implemented - returning NULL")
-  return(NULL)
+.get_intact_ppi <- function(proteins, species, min_confidence) {
+  tryCatch(
+    {
+      # Map species names to taxonomy IDs
+      species_map <- list(
+        "Homo sapiens" = "9606",
+        "Mus musculus" = "10090"
+      )
+
+      taxid <- species_map[[species]]
+      if (is.null(taxid)) {
+        warning("Species not supported for IntAct: ", species)
+        return(NULL)
+      }
+
+      processed_file <- system.file("extdata", "intact_processed.rds", package = "MPAGE")
+
+      if (is.null(processed_file)) {
+        message("No preprocessed IntAct data found. Use preprocess_intact_data() to create it.")
+        return(NULL)
+      }
+      message("IntAct database was downloaded at 15/08/2025")
+      message("Loading IntAct network from: ", processed_file)
+
+      # Load and filter data
+      intact_data <- readRDS(processed_file) %>% dplyr::filter(score >= min_confidence)
+
+      # Filter by species
+      species_data <- intact_data[intact_data$taxid == taxid, ]
+
+      if (nrow(species_data) == 0) {
+        warning("No IntAct data found for species: ", species)
+        return(NULL)
+      }
+
+      # Create igraph object
+      net <- igraph::graph_from_data_frame(
+        species_data[, c("geneA", "geneB")],
+        directed = FALSE
+      )
+
+      # Add edge attributes
+      igraph::E(net)$weight <- species_data$score
+      igraph::E(net)$source <- "IntAct"
+      cat("IntAct DB Network Summary:\n")
+      cat("Nodes:", length(igraph::V(net)), "\n")
+      cat("Edges:", length(igraph::E(net)), "\n")
+      cat("Average degree:", mean(igraph::degree(net)), "\n")
+      return(net)
+    },
+    error = function(e) {
+      warning("Error loading IntAct data: ", e$message)
+      return(NULL)
+    }
+  )
 }
 
 #' Get InBioMap PPI (placeholder)
