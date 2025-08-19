@@ -89,15 +89,7 @@ build_ppi_network <- function(proteins = NULL,
     if (!is.null(intact_net)) networks$IntAct <- intact_net
   }
 
-  # InBioMap database (simplified - would need actual API calls)
-  if ("InBioMap" %in% data_sources) {
-    if (!requireNamespace("OmnipathR", quietly = TRUE)) {
-      warning("OmnipathR package not available. Skipping InBioMap database.")
-    } else {
-      intact_net <- .get_inbiomap_ppi(proteins, species)
-      if (!is.null(intact_net)) networks$IntAct <- intact_net
-    }
-  }
+
 
 
   if (length(networks) == 0) {
