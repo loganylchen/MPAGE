@@ -43,7 +43,9 @@ Suggests:
     BiocStyle,
     pheatmap,
     RColorBrewer,
-    circlize
+    circlize,
+    visNetwork,
+    Cairo
 VignetteBuilder: knitr
 URL: https://github.com/loganylchen/MPAGE
 BugReports: https://github.com/loganylchen/MPAGE/issues
