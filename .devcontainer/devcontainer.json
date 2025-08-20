@@ -19,7 +19,8 @@
         "mathematic.vscode-latex",
         "REditorSupport.r",
         "redhat.vscode-yaml",
-        "ms-python.python"
+        "ms-python.python",
+        "ms-toolsai.vscode-jupyter-powertoys"
       ]
     }
   },
