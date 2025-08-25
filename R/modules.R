@@ -1,294 +1,163 @@
-#' Identify Modules
+#' Iterative Module Identification with Target Proteins
 #'
-#' Identify modules from PPI network using various algorithms
+#' Identify network modules using louvain and fast_greedy algorithms iteratively,
+#' focusing on modules that contain target proteins
 #'
 #' @param ppi_network An igraph object representing the PPI network
-#' @param algorithms Character vector of algorithms to use ("CLUSTERONE", "MCODE", "FASTGREEDY")
 #' @param min_module_size Minimum number of nodes in a module
-#' @param clusterone_params List of parameters for CLUSTERONE algorithm
-#' @param mcode_params List of parameters for MCODE algorithm
+#' @param max_module_size Maximum number of nodes in a module
+#' @param target_proteins Character vector of target proteins to focus on
 #'
-#' @return A list containing identified modules
+#' @return A list containing all identified modules that contain target proteins
 #'
 #' @export
 #'
 #' @examples
-#' modules <- identify_modules(
+#' modules <- identify_modules_iterative(
 #'   ppi_network = ppi_network,
-#'   algorithms = c("CLUSTERONE", "MCODE"),
-#'   min_module_size = 5
+#'   min_module_size = 10,
+#'   max_module_size = 1000,
+#'   target_proteins = c("DNMT1", "DNMT3A", "TET1")
 #' )
-identify_modules <- function(ppi_network,
-                        algorithms = c("CLUSTERONE", "MCODE", "FASTGREEDY"),
-                        min_module_size = 5,
-                        clusterone_params = list(density_threshold = 0.3),
-                        mcode_params = list(degree_cutoff = 2)) {
-  
+identify_modules_iterative <- function(ppi_network,
+                                       min_module_size = 10,
+                                       max_module_size = 1000,
+                                       target_proteins = NULL) {
   if (!igraph::is.igraph(ppi_network)) {
     stop("ppi_network must be an igraph object")
   }
-  
-  modules <- list()
-  
-  # Fast Greedy algorithm (igraph implementation)
-  if ("FASTGREEDY" %in% algorithms) {
-    tryCatch({
-      fc <- igraph::cluster_fast_greedy(ppi_network)
-      module_list <- igraph::groups(fc)
-      
-      # Filter by minimum size
-      module_list <- module_list[sapply(module_list, length) >= min_module_size]
-      
-      modules$FASTGREEDY <- lapply(seq_along(module_list), function(i) {
-        list(
-          module_id = paste0("FG", i),
-          genes = module_list[[i]],
-          size = length(module_list[[i]]),
-          algorithm = "FASTGREEDY"
-        )
-      })
-    }, error = function(e) {
-      warning("Fast Greedy algorithm failed: ", e$message)
-    })
-  }
-  
-  # MCODE (simplified implementation)
-  if ("MCODE" %in% algorithms) {
-    tryCatch({
-      mcode_modules <- .mcode_algorithm(ppi_network, mcode_params)
-      mcode_modules <- mcode_modules[sapply(mcode_modules, function(x) length(x$genes)) >= min_module_size]
-      modules$MCODE <- mcode_modules
-    }, error = function(e) {
-      warning("MCODE algorithm failed: ", e$message)
-    })
-  }
-  
-  # CLUSTERONE (simplified implementation)
-  if ("CLUSTERONE" %in% algorithms) {
-    tryCatch({
-      clusterone_modules <- .clusterone_algorithm(ppi_network, clusterone_params)
-      clusterone_modules <- clusterone_modules[sapply(clusterone_modules, function(x) length(x$genes)) >= min_module_size]
-      modules$CLUSTERONE <- clusterone_modules
-    }, error = function(e) {
-      warning("CLUSTERONE algorithm failed: ", e$message)
-    })
-  }
-  
-  # Flatten modules list
-  all_modules <- unlist(modules, recursive = FALSE)
-  names(all_modules) <- NULL
-  
-  return(all_modules)
-}
 
-#' MCODE Algorithm (simplified)
-#' @noRd
-.mcode_algorithm <- function(graph, params) {
-  # Simplified MCODE implementation
-  # In practice, use the MCODE R package or implement full algorithm
-  
-  degree_cutoff <- params$degree_cutoff %||% 2
-  degrees <- igraph::degree(graph)
-  
-  # Simple density-based clustering
-  high_degree_nodes <- which(degrees >= degree_cutoff)
-  
-  if (length(high_degree_nodes) == 0) {
+  if (is.null(target_proteins) || length(target_proteins) == 0) {
+    stop("target_proteins must be provided")
+  }
+
+  # Get all vertex names in the network
+  all_vertices <- igraph::V(ppi_network)$name
+
+  # Check if target proteins are in the network
+  target_in_network <- target_proteins[target_proteins %in% all_vertices]
+  if (length(target_in_network) == 0) {
+    warning("None of the target proteins are found in the network")
     return(list())
   }
-  
-  # Create modules around high-degree nodes
-  modules <- list()
-  used_nodes <- c()
-  
-  for (i in seq_along(high_degree_nodes)) {
-    node <- high_degree_nodes[i]
-    if (node %in% used_nodes) next
-    
-    # Get neighbors
-    neighbors <- igraph::neighbors(graph, node)
-    module_nodes <- c(node, neighbors)
-    
-    # Remove already used nodes
-    module_nodes <- setdiff(module_nodes, used_nodes)
-    
-    if (length(module_nodes) >= 2) {
-      modules[[length(modules) + 1]] <- list(
-        module_id = paste0("MC", length(modules) + 1),
-        genes = names(module_nodes),
-        size = length(module_nodes),
-        algorithm = "MCODE"
-      )
-      used_nodes <- c(used_nodes, module_nodes)
-    }
-  }
-  
-  return(modules)
-}
 
-#' CLUSTERONE Algorithm (simplified)
-#' @noRd
-.clusterone_algorithm <- function(graph, params) {
-  # Simplified CLUSTERONE implementation
-  density_threshold <- params$density_threshold %||% 0.3
-  
-  # Use fast greedy clustering as approximation
-  fc <- igraph::cluster_fast_greedy(graph)
-  module_list <- igraph::groups(fc)
-  
-  # Filter based on density
-  modules <- list()
-  for (i in seq_along(module_list)) {
-    subgraph <- igraph::induced_subgraph(graph, module_list[[i]])
-    density <- igraph::edge_density(subgraph)
-    
-    if (density >= density_threshold) {
-      modules[[length(modules) + 1]] <- list(
-        module_id = paste0("CL", length(modules) + 1),
-        genes = names(module_list[[i]]),
-        size = length(module_list[[i]]),
-        density = density,
-        algorithm = "CLUSTERONE"
-      )
-    }
-  }
-  
-  return(modules)
-}
+  # Initialize result list
+  final_modules <- list()
 
-#' Filter RNA Modules
-#'
-#' Filter modules to retain those containing RNA modification proteins
-#'
-#' @param modules List of modules from identify_modules()
-#' @param rna_proteins Character vector of RNA modification proteins
-#' @param min_rna_proteins Minimum number of RNA modification proteins in module
-#' @param min_rna_ratio Minimum ratio of RNA modification proteins in module
-#'
-#' @return Filtered list of modules
-#'
-#' @export
-#'
-#' @examples
-#' rna_modules <- filter_rna_modules(
-#'   modules = modules,
-#'   rna_proteins = rna_mod_proteins$gene_symbol,
-#'   min_rna_proteins = 2,
-#'   min_rna_ratio = 0.15
-#' )
-filter_rna_modules <- function(modules, rna_proteins, min_rna_proteins = 2, min_rna_ratio = 0.15) {
-  if (!is.list(modules)) {
-    stop("modules must be a list")
+  # Helper function to check if a module contains target proteins
+  contains_targets <- function(module_genes) {
+    any(module_genes %in% target_in_network)
   }
-  
-  filtered_modules <- list()
-  
-  for (i in seq_along(modules)) {
-    module <- modules[[i]]
-    if (!"genes" %in% names(module)) next
-    
-    # Count RNA modification proteins in module
-    rna_in_module <- sum(module$genes %in% rna_proteins)
-    total_genes <- length(module$genes)
-    
-    # Check filtering criteria
-    if (rna_in_module >= min_rna_proteins && 
-        (rna_in_module / total_genes) >= min_rna_ratio) {
-      
-      # Add RNA protein information
-      module$rna_proteins <- module$genes[module$genes %in% rna_proteins]
-      module$rna_count <- rna_in_module
-      module$rna_ratio <- rna_in_module / total_genes
-      
-      filtered_modules[[length(filtered_modules) + 1]] <- module
-    }
-  }
-  
-  return(filtered_modules)
-}
 
-#' Annotate Modules
-#'
-#' Annotate modules with functional information using GO enrichment
-#'
-#' @param modules List of modules to annotate
-#' @param ppi_network Original PPI network (igraph object)
-#' @param organism Organism identifier (e.g., "hsa" for human)
-#'
-#' @return Annotated modules with GO enrichment results
-#'
-#' @export
-#'
-#' @examples
-#' annotated_modules <- annotate_modules(
-#'   rna_modules,
-#'   ppi_network = ppi_network,
-#'   organism = "hsa"
-#' )
-annotate_modules <- function(modules, ppi_network, organism = "hsa") {
-  if (!is.list(modules)) {
-    stop("modules must be a list")
-  }
-  
-  if (!requireNamespace("clusterProfiler", quietly = TRUE)) {
-    warning("clusterProfiler package not available. Skipping GO annotation.")
+  # Helper function for recursive clustering
+  recursive_clustering <- function(subgraph, targets_in_subgraph, depth = 1) {
+    modules <- list()
+
+    # Use fast_greedy on the subgraph
+    tryCatch(
+      {
+        fc <- igraph::cluster_fast_greedy(subgraph)
+        module_list <- igraph::groups(fc)
+
+        # Process each module
+        for (i in seq_along(module_list)) {
+          module_genes <- module_list[[i]]
+          module_size <- length(module_genes)
+
+          # Check if module contains target proteins
+          if (contains_targets(module_genes)) {
+            # Check size criteria
+            if (module_size >= min_module_size && module_size <= max_module_size) {
+              # Valid module - add to results
+              modules[[length(modules) + 1]] <- list(
+                module_id = paste0("RC", depth, "_", length(modules) + 1),
+                genes = module_genes,
+                size = module_size,
+                algorithm = "FASTGREEDY",
+                depth = depth,
+                target_proteins = module_genes[module_genes %in% targets_in_subgraph]
+              )
+            } else if (module_size > max_module_size) {
+              # Module too large - recurse further
+              subgraph_module <- igraph::induced_subgraph(subgraph, module_genes)
+
+              # Only recurse if we have targets in this subgraph
+              targets_here <- targets_in_subgraph[targets_in_subgraph %in% module_genes]
+              if (length(targets_here) > 0) {
+                sub_modules <- recursive_clustering(subgraph_module, targets_here, depth + 1)
+                modules <- c(modules, sub_modules)
+              }
+            }
+            # Skip modules smaller than min_module_size
+          }
+        }
+      },
+      error = function(e) {
+        warning("Fast Greedy clustering failed at depth ", depth, ": ", e$message)
+      }
+    )
+
     return(modules)
   }
-  
-  annotated_modules <- modules
-  
-  for (i in seq_along(modules)) {
-    module <- modules[[i]]
-    if (!"genes" %in% names(module)) next
-    
-    # Calculate module properties
-    subgraph <- igraph::induced_subgraph(ppi_network, module$genes)
-    
-    module$num_nodes <- length(module$genes)
-    module$num_edges <- igraph::ecount(subgraph)
-    module$density <- igraph::edge_density(subgraph)
-    module$avg_degree <- mean(igraph::degree(subgraph))
-    
-    # Calculate centrality measures
-    if (module$num_nodes > 1) {
-      module$betweenness <- mean(igraph::betweenness(subgraph), na.rm = TRUE)
-    } else {
-      module$betweenness <- 0
-    }
-    
-    # GO enrichment analysis
-    tryCatch({
-      ego_ids <- AnnotationDbi::mapIds(
-        org.Hs.eg.db::org.Hs.eg.db,
-        keys = module$genes,
-        column = "ENTREZID",
-        keytype = "SYMBOL"
-      )
-      ego_ids <- na.omit(ego_ids)
-      
-      if (length(ego_ids) >= 3) {
-        ego <- enrichGO(
-          gene = names(ego_ids),
-          OrgDb = org.Hs.eg.db::org.Hs.eg.db,
-          ont = "ALL",
-          pAdjustMethod = "BH",
-          pvalueCutoff = 0.05,
-          qvalueCutoff = 0.2
-        )
-        
-        if (!is.null(ego) && nrow(ego@result) > 0) {
-          module$go_enrichment <- ego
-          module$top_go_terms <- head(ego@result$Description, 3)
+
+  # Step 1: Initial clustering with Louvain
+  tryCatch(
+    {
+      louvain_cluster <- igraph::cluster_louvain(ppi_network)
+      louvain_modules <- igraph::groups(louvain_cluster)
+
+      # Process each louvain module
+      candidate_modules <- list()
+
+      for (i in seq_along(louvain_modules)) {
+        module_genes <- louvain_modules[[i]]
+        module_size <- length(module_genes)
+
+        # Check if module contains target proteins
+        if (contains_targets(module_genes)) {
+          if (module_size >= min_module_size && module_size <= max_module_size) {
+            # Valid module - keep as is
+            candidate_modules[[length(candidate_modules) + 1]] <- list(
+              module_id = paste0("L", i),
+              genes = module_genes,
+              size = module_size,
+              algorithm = "LOUVAIN",
+              depth = 0,
+              target_proteins = module_genes[module_genes %in% target_in_network]
+            )
+          } else if (module_size > max_module_size) {
+            # Too large - apply fast_greedy recursively
+            subgraph <- igraph::induced_subgraph(ppi_network, module_genes)
+            targets_here <- target_in_network[target_in_network %in% module_genes]
+
+            if (length(targets_here) > 0) {
+              sub_modules <- recursive_clustering(subgraph, targets_here, 1)
+              candidate_modules <- c(candidate_modules, sub_modules)
+            }
+          }
+          # Skip modules smaller than min_module_size
         }
       }
-    }, error = function(e) {
-      warning("GO enrichment failed for module ", module$module_id, ": ", e$message)
-    })
-    
-    annotated_modules[[i]] <- module
+    },
+    error = function(e) {
+      warning("Louvain clustering failed: ", e$message)
+      candidate_modules <- list()
+    }
+  )
+
+  # Return all modules with target proteins (no deduplication)
+  final_modules <- candidate_modules
+
+  # Add summary information
+  if (length(final_modules) > 0) {
+    message("Identified ", length(final_modules), " modules containing target proteins")
+    message(
+      "Total target proteins covered: ",
+      length(unique(unlist(lapply(final_modules, function(x) x$target_proteins))))
+    )
   }
-  
-  return(annotated_modules)
+
+  return(final_modules)
 }
 
 #' Save Modules
@@ -306,7 +175,7 @@ save_modules <- function(modules, file_path) {
   if (!is.list(modules)) {
     stop("modules must be a list")
   }
-  
+
   save(modules, file = file_path)
   message("Modules saved to: ", file_path)
 }
@@ -327,13 +196,13 @@ load_modules <- function(file_path) {
   if (!file.exists(file_path)) {
     stop("File does not exist: ", file_path)
   }
-  
+
   env <- new.env()
   load(file_path, envir = env)
-  
+
   if (!exists("modules", envir = env)) {
     stop("No 'modules' object found in the file")
   }
-  
+
   return(get("modules", envir = env))
 }
