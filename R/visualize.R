@@ -7,12 +7,13 @@
 #' Create various visualizations of protein-protein interaction networks
 #'
 #' @param network An igraph object representing the PPI network
+#' @param input_proteins Vector of protein names to extract sub-network. If NULL, visualizes the whole network.
 #' @param layout_type Layout algorithm for network visualization ("fr", "kk", "circle", "spring", "tree")
 #' @param node_color Color scheme for nodes ("degree", "community", "source", "uniform")
 #' @param edge_color Color scheme for edges ("weight", "source", "uniform")
 #' @param node_size Size of nodes ("degree", "uniform", "betweenness")
 #' @param show_labels Whether to display node labels
-#' @param highlight_nodes Vector of node names to highlight
+#' @param highlight_nodes Vector of node names to highlight with red color and star shape
 #' @param title Plot title
 #' @param save_path Optional path to save the plot
 #' @param width Plot width in inches
@@ -30,6 +31,12 @@
 #' merged <- merge_ppi_networks(networks, merge_method = "union")
 #' viz <- visualize_ppi_network(merged)
 #'
+#' # Sub-network visualization
+#' sub_viz <- visualize_ppi_network(merged, input_proteins = c("TP53", "BRCA1"))
+#'
+#' # Highlight specific proteins
+#' highlight_viz <- visualize_ppi_network(merged, highlight_nodes = c("TP53", "BRCA1"))
+#'
 #' # Interactive visualization
 #' interactive_viz <- visualize_ppi_network(merged, interactive = TRUE)
 #'
@@ -37,6 +44,7 @@
 #' visualize_ppi_network(merged, save_path = "ppi_network.png", width = 12, height = 8)
 #' }
 visualize_ppi_network <- function(network,
+                                  input_proteins = NULL,
                                   layout_type = "fr",
                                   node_color = "degree",
                                   edge_color = "weight",
@@ -57,13 +65,51 @@ visualize_ppi_network <- function(network,
     return(NULL)
   }
 
+  # Handle sub-network extraction based on input_proteins
+  if (!is.null(input_proteins)) {
+    input_proteins <- toupper(input_proteins)
+
+    # Find nodes that exist in the network
+    network_nodes <- toupper(igraph::V(network)$name)
+    valid_proteins <- input_proteins[input_proteins %in% network_nodes]
+
+    if (length(valid_proteins) == 0) {
+      warning("None of the input proteins found in the network")
+      return(NULL)
+    }
+
+    # Extract sub-network including neighbors
+    sub_network <- igraph::induced_subgraph(
+      network,
+      vids = igraph::V(network)[toupper(igraph::V(network)$name) %in% valid_proteins]
+    )
+
+    # Add first-order neighbors if available
+    neighbors <- unique(unlist(igraph::neighborhood(sub_network, order = 1)))
+    if (length(neighbors) > 0) {
+      sub_network <- igraph::induced_subgraph(network, vids = neighbors)
+    }
+
+    network <- sub_network
+
+    if (igraph::vcount(network) == 0) {
+      warning("No sub-network could be extracted")
+      return(NULL)
+    }
+
+    # Update title to indicate sub-network
+    if (is.null(title) || title == "PPI Network") {
+      title <- paste("Sub-network with", length(valid_proteins), "seed proteins")
+    }
+  }
+
   if (interactive) {
     # Create interactive visualization using visNetwork
     if (!requireNamespace("visNetwork", quietly = TRUE)) {
       warning("visNetwork package not available, falling back to static plot")
       interactive <- FALSE
     } else {
-      return(.create_interactive_network(network, node_color, node_size, title))
+      return(.create_interactive_network(network, node_color, node_size, title, highlight_nodes))
     }
   }
 
@@ -124,13 +170,7 @@ visualize_ppi_network <- function(network,
     rep(5, igraph::vcount(network))
   )
 
-  # Prepare edge colors and widths
-  edge_colors <- switch(edge_color,
-    "weight" = colorRampPalette(c("lightgray", "darkgray"))(length(unique(edge_weights)))[as.numeric(cut(edge_weights, breaks = length(unique(edge_weights))))],
-    "source" = ifelse(!is.null(igraph::E(network)$sources), "darkgreen", "gray"),
-    "uniform" = rep("gray80", igraph::ecount(network)),
-    rep("gray80", igraph::ecount(network))
-  )
+
 
   edge_widths <- sqrt(edge_weights) * 0.5 + 0.5
 
@@ -142,7 +182,6 @@ visualize_ppi_network <- function(network,
     vertex.label = ifelse(show_labels, igraph::V(network)$name, NA),
     vertex.label.cex = 0.7,
     vertex.label.color = "black",
-    edge.color = edge_colors,
     edge.width = edge_widths,
     edge.arrow.size = 0.3,
     main = title
@@ -174,7 +213,7 @@ visualize_ppi_network <- function(network,
 
 #' Create Interactive Network Visualization
 #' @noRd
-.create_interactive_network <- function(network, node_color, node_size, title) {
+.create_interactive_network <- function(network, node_color, node_size, title, highlight_nodes = NULL) {
   # Prepare node data
   node_df <- data.frame(
     id = igraph::V(network)$name,
@@ -205,6 +244,14 @@ visualize_ppi_network <- function(network,
     node_df$size <- sqrt(node_df$betweenness) * 20 + 10
   } else {
     node_df$size <- 15
+  }
+
+  # Handle highlighted nodes
+  if (!is.null(highlight_nodes)) {
+    highlight_nodes <- toupper(highlight_nodes)
+    node_df$borderWidth <- ifelse(toupper(node_df$id) %in% highlight_nodes, 3, 1)
+    node_df$borderColor <- ifelse(toupper(node_df$id) %in% highlight_nodes, "red", "black")
+    node_df$shape <- ifelse(toupper(node_df$id) %in% highlight_nodes, "star", "dot")
   }
 
   # Create interactive network
