@@ -1,3 +1,4 @@
+set.seed(422)
 #' Module Activity Comparison
 #'
 #' Compare module activity scores between case and control conditions using Fisher exact test.
@@ -17,7 +18,7 @@
 #'
 module_activity_comparison <- function(expression_matrix, sample_condition, modules,
                                        module_pairs = NULL, min_samples = 3,
-                                       activity_method = "gsva") {
+                                       activity_method = "gsva", temp_dir = "./temp") {
   # Input validation
   if (!is.matrix(expression_matrix) && !is.data.frame(expression_matrix)) {
     stop("expression_matrix must be a matrix or data frame")
@@ -68,7 +69,7 @@ module_activity_comparison <- function(expression_matrix, sample_condition, modu
   }
 
   # Calculate module activity scores
-  activity_scores <- calculate_module_activity(expr_mat, module_genes, method = activity_method)
+  activity_scores <- calculate_module_activity(expr_mat, module_genes, method = activity_method, temp_dir = temp_dir)
 
   if (is.null(activity_scores) || nrow(activity_scores) == 0) {
     warning("Could not calculate module activity scores")
@@ -641,7 +642,9 @@ inter_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
 #' @return Matrix with module activity scores (modules as rows, samples as columns)
 #'
 #' @noRd
-calculate_module_activity <- function(expression_matrix, module_genes, method = "gsva") {
+calculate_module_activity <- function(expression_matrix, module_genes, method = "gsva", temp_dir = "./temp") {
+  temp_data <- file.path(temp_dir, paste0(method, "_score.rds"))
+  dir.create(temp_dir, recursive = TRUE)
   # Check required packages
   if (method == "gsva" && !requireNamespace("GSVA", quietly = TRUE)) {
     stop("GSVA package is required for GSVA method. Please install with: BiocManager::install('GSVA')")
@@ -682,6 +685,8 @@ calculate_module_activity <- function(expression_matrix, module_genes, method = 
         }
       )
       scores <- GSVA::gsva(params)
+      saveRDS(scores, temp_data)
+      message(sprintf("Writing the score matrix into '%s'", temp_data))
       return(scores)
     },
     error = function(e) {
@@ -740,7 +745,7 @@ calculate_module_activity <- function(expression_matrix, module_genes, method = 
 #' }
 final_integrated_analysis <- function(expression_matrix, sample_condition, modules,
                                       module_pairs = NULL,
-                                      min_samples = 3, activity_method = c("gsva", "ssgsea", "zscore", "plage")) {
+                                      min_samples = 3, activity_method = c("gsva", "ssgsea", "zscore", "plage"), temp_dir = "./temp") {
   # Validate inputs
   if (!is.matrix(expression_matrix) && !is.data.frame(expression_matrix)) {
     stop("expression_matrix must be a matrix or data frame")
@@ -864,7 +869,8 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
       modules = modules,
       module_pairs = module_pairs,
       min_samples = min_samples,
-      activity_method = method
+      activity_method = method,
+      temp_dir = temp_dir
     )
 
     if (nrow(activity_results) > 0) {

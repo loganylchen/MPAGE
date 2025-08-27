@@ -1,3 +1,4 @@
+set.seed(422)
 #' Build PPI Network (Revised)
 #'
 #' Construct protein-protein interaction network from multiple data sources using unified interface
@@ -259,4 +260,3 @@ merge_ppi_networks <- function(networks, merge_method = "union", add_source_labe
 
   return(merged_network)
 }
-

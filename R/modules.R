@@ -1,3 +1,4 @@
+set.seed(422)
 #' Iterative Module Identification with Target Proteins
 #'
 #' Identify network modules using louvain and fast_greedy algorithms iteratively,
@@ -56,6 +57,7 @@ identify_modules_iterative <- function(ppi_network,
     # Use fast_greedy on the subgraph
     tryCatch(
       {
+        set.seed(422)
         fc <- igraph::cluster_fast_greedy(subgraph)
         module_list <- igraph::groups(fc)
 
@@ -103,6 +105,7 @@ identify_modules_iterative <- function(ppi_network,
   # Step 1: Initial clustering with Louvain
   tryCatch(
     {
+      set.seed(422)
       louvain_cluster <- igraph::cluster_louvain(ppi_network)
       louvain_modules <- igraph::groups(louvain_cluster)
 
