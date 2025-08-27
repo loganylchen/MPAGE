@@ -94,10 +94,25 @@ module_activity_comparison <- function(expression_matrix, sample_condition, modu
     ))
   }
 
+  # Check if progress package is available
+  has_progress <- requireNamespace("progress", quietly = TRUE)
+  
+  # Setup progress bar if available
+  if (has_progress) {
+    pb <- progress::progress_bar$new(
+      format = "  [:bar] :percent (:current/:total) ETA: :eta",
+      total = length(module_pairs), clear = FALSE, width = 60
+    )
+  }
+
   # Analyze each module pair
   results_list <- list()
 
-  for (pair in module_pairs) {
+  for (i in seq_along(module_pairs)) {
+    pair <- module_pairs[[i]]
+    
+    if (has_progress) pb$tick()
+    
     if (length(pair) != 2) {
       warning("Each module pair must contain exactly 2 module names")
       next
@@ -143,8 +158,8 @@ module_activity_comparison <- function(expression_matrix, sample_condition, modu
       contingency_table <- contingency_table + 0.5 # Add small pseudocount
     }
 
-    # Fisher exact test
-    fisher_result <- fisher.test(contingency_table)
+    # Fisher exact test with warning suppression
+    fisher_result <- suppressWarnings(fisher.test(contingency_table))
 
     # Calculate additional metrics
     case_ratio <- sum(case_patterns$module1_greater) / length(case_samples)
@@ -273,12 +288,32 @@ intra_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
     ))
   }
 
+  # Check if progress package is available
+  has_progress <- requireNamespace("progress", quietly = TRUE)
+  
+  # Calculate total number of gene pairs for progress bar
+  total_pairs <- 0
+  for (module_name in names(module_genes)) {
+    available_genes <- intersect(module_genes[[module_name]], rownames(expr_mat))
+    if (length(available_genes) >= 2) {
+      total_pairs <- total_pairs + choose(length(available_genes), 2)
+    }
+  }
+  
+  # Setup progress bar if available
+  if (has_progress && total_pairs > 0) {
+    pb <- progress::progress_bar$new(
+      format = "  [:bar] :percent (:current/:total) ETA: :eta",
+      total = total_pairs, clear = FALSE, width = 60
+    )
+  }
+
   # Analyze each gene pair
   results_list <- list()
+  processed_pairs <- 0
 
   for (module_name in names(module_genes)) {
     # Filter module genes for available genes
-
     available_genes <- intersect(module_genes[[module_name]], rownames(expr_mat))
 
     if (length(available_genes) < 2) {
@@ -287,51 +322,49 @@ intra_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
     }
 
     # Generate all possible gene pairs within the module
-    if (length(available_genes) >= 2) {
-      gene_pairs <- combn(available_genes, 2, simplify = FALSE)
-    } else {
-      next
-    }
-  }
+    gene_pairs <- combn(available_genes, 2, simplify = FALSE)
 
-  for (pair in gene_pairs) {
-    gene1 <- pair[1]
-    gene2 <- pair[2]
+    for (pair in gene_pairs) {
+      processed_pairs <- processed_pairs + 1
+      if (has_progress && total_pairs > 0) pb$tick()
+      
+      gene1 <- pair[1]
+      gene2 <- pair[2]
 
-    # Get expression values
-    expr1 <- expr_mat[gene1, ]
-    expr2 <- expr_mat[gene2, ]
+      # Get expression values
+      expr1 <- expr_mat[gene1, ]
+      expr2 <- expr_mat[gene2, ]
 
-    # Separate by condition
-    expr1_case <- expr1[case_samples]
-    expr2_case <- expr2[case_samples]
-    expr1_control <- expr1[control_samples]
-    expr2_control <- expr2[control_samples]
+      # Separate by condition
+      expr1_case <- expr1[case_samples]
+      expr2_case <- expr2[case_samples]
+      expr1_control <- expr1[control_samples]
+      expr2_control <- expr2[control_samples]
 
-    # Classify expression patterns
-    case_patterns <- classify_expression_pattern(expr1_case, expr2_case)
-    control_patterns <- classify_expression_pattern(expr1_control, expr2_control)
+      # Classify expression patterns
+      case_patterns <- classify_expression_pattern(expr1_case, expr2_case)
+      control_patterns <- classify_expression_pattern(expr1_control, expr2_control)
 
-    # Create 2x2 contingency table for Fisher exact test
-    # Rows: gene1 > gene2 (TRUE/FALSE)
-    # Columns: condition (case/control)
-    contingency_table <- matrix(0, nrow = 2, ncol = 2)
-    rownames(contingency_table) <- c("gene1_greater", "gene1_not_greater")
-    colnames(contingency_table) <- c("case", "control")
+      # Create 2x2 contingency table for Fisher exact test
+      # Rows: gene1 > gene2 (TRUE/FALSE)
+      # Columns: condition (case/control)
+      contingency_table <- matrix(0, nrow = 2, ncol = 2)
+      rownames(contingency_table) <- c("gene1_greater", "gene1_not_greater")
+      colnames(contingency_table) <- c("case", "control")
 
-    # Fill the table
-    contingency_table[1, 1] <- sum(case_patterns$gene1_greater) # gene1 > gene2 in case
-    contingency_table[2, 1] <- sum(case_patterns$gene2_greater) # gene2 > gene1 in case
-    contingency_table[1, 2] <- sum(control_patterns$gene1_greater) # gene1 > gene2 in control
-    contingency_table[2, 2] <- sum(control_patterns$gene2_greater) # gene2 > gene1 in control
+      # Fill the table
+      contingency_table[1, 1] <- sum(case_patterns$gene1_greater) # gene1 > gene2 in case
+      contingency_table[2, 1] <- sum(case_patterns$gene2_greater) # gene2 > gene1 in case
+      contingency_table[1, 2] <- sum(control_patterns$gene1_greater) # gene1 > gene2 in control
+      contingency_table[2, 2] <- sum(control_patterns$gene2_greater) # gene2 > gene1 in control
 
-    # Ensure table has no zero rows/columns
-    if (any(contingency_table == 0)) {
-      contingency_table <- contingency_table + 0.5 # Add small pseudocount
-    }
+      # Ensure table has no zero rows/columns
+      if (any(contingency_table == 0)) {
+        contingency_table <- contingency_table + 0.5 # Add small pseudocount
+      }
 
-    # Fisher exact test
-    fisher_result <- fisher.test(contingency_table)
+      # Fisher exact test with warning suppression
+      fisher_result <- suppressWarnings(fisher.test(contingency_table))
 
     # Calculate additional metrics
     case_ratio <- sum(case_patterns$gene1_greater) / length(case_samples)
@@ -450,8 +483,47 @@ inter_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
   module_names <- names(modules)
   module_pairs <- combn(module_names, 2, simplify = FALSE)
 
+  # Check if progress package is available
+  has_progress <- requireNamespace("progress", quietly = TRUE)
+  
+  # Calculate total number of gene pairs for progress bar
+  total_pairs <- 0
+  for (pair in module_pairs) {
+    if (length(pair) == 2) {
+      module1 <- pair[1]
+      module2 <- pair[2]
+      module1_available <- intersect(module_genes[[module1]], rownames(expr_mat))
+      module2_available <- intersect(module_genes[[module2]], rownames(expr_mat))
+      if (length(module1_available) >= 1 && length(module2_available) >= 1) {
+        total_pairs <- total_pairs + length(module1_available) * length(module2_available)
+      }
+    }
+  }
+  
+  # Setup progress bar if available
+  if (has_progress && total_pairs > 0) {
+    pb <- progress::progress_bar$new(
+      format = "  [:bar] :percent (:current/:total) ETA: :eta",
+      total = total_pairs, clear = FALSE, width = 60
+    )
+  }
+
+  # Function to classify expression pattern for Fisher test
+  classify_expression_pattern <- function(expr1, expr2) {
+    gene1_greater <- expr1 > expr2
+    gene2_greater <- expr2 > expr1
+    equal_expression <- expr1 == expr2
+
+    return(list(
+      gene1_greater = gene1_greater,
+      gene2_greater = gene2_greater,
+      equal_expression = equal_expression
+    ))
+  }
+
   # Analyze each module pair
   results_list <- list()
+  processed_pairs <- 0
 
   for (pair in module_pairs) {
     if (length(pair) != 2) {
@@ -467,27 +539,17 @@ inter_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
     module2_available <- intersect(module_genes[[module2]], rownames(expr_mat))
 
     if (length(module1_available) < 1 || length(module2_available) < 1) {
-      warning(printf("No genes available in one or both modules:%s:%s", module1, module2))
+      warning(sprintf("No genes available in one or both modules:%s:%s", module1, module2))
       next
     }
 
     # Generate all possible gene pairs between modules
     gene_pairs <- expand.grid(module1 = module1_available, module2 = module2_available, stringsAsFactors = FALSE)
 
-    # Function to classify expression pattern for Fisher test
-    classify_expression_pattern <- function(expr1, expr2) {
-      gene1_greater <- expr1 > expr2
-      gene2_greater <- expr2 > expr1
-      equal_expression <- expr1 == expr2
-
-      return(list(
-        gene1_greater = gene1_greater,
-        gene2_greater = gene2_greater,
-        equal_expression = equal_expression
-      ))
-    }
-
     for (i in 1:nrow(gene_pairs)) {
+      processed_pairs <- processed_pairs + 1
+      if (has_progress && total_pairs > 0) pb$tick()
+      
       gene1 <- gene_pairs$module1[i]
       gene2 <- gene_pairs$module2[i]
 
@@ -523,8 +585,8 @@ inter_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
         contingency_table <- contingency_table + 0.5 # Add small pseudocount
       }
 
-      # Fisher exact test
-      fisher_result <- fisher.test(contingency_table)
+      # Fisher exact test with warning suppression
+      fisher_result <- suppressWarnings(fisher.test(contingency_table))
 
       # Calculate additional metrics
       case_ratio <- sum(case_patterns$gene1_greater) / length(case_samples)
@@ -638,7 +700,7 @@ calculate_module_activity <- function(expression_matrix, module_genes, method = 
 #' @param modules List of modules, each containing genes (e.g., list(module1 = c("gene1", "gene2"), module2 = c("gene3", "gene4")))
 #' @param module_pairs List of specific module pairs to compare. If NULL, compares all possible pairs.
 #' @param min_samples Minimum samples per condition for valid analysis (default: 3)
-#' @param activity_method Method to calculate module activity (default: "gsva")
+#' @param activity_method List of methods to calculate module activity. Default: c("gsva", "ssgsea", "zscore", "plage")
 #'
 #' @return List containing results from all three analysis types with metadata
 #'
@@ -677,7 +739,7 @@ calculate_module_activity <- function(expression_matrix, module_genes, method = 
 #' }
 final_integrated_analysis <- function(expression_matrix, sample_condition, modules,
                                       module_pairs = NULL,
-                                      min_samples = 3, activity_method = "gsva") {
+                                      min_samples = 3, activity_method = c("gsva", "ssgsea", "zscore", "plage")) {
   # Validate inputs
   if (!is.matrix(expression_matrix) && !is.data.frame(expression_matrix)) {
     stop("expression_matrix must be a matrix or data frame")
@@ -713,13 +775,15 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
     stop("Insufficient samples in one or both conditions")
   }
 
-  # Extract gene lists from module structure
+# Extract gene lists from module structure
   if (is.list(modules) && length(modules) > 0) {
     # Check if modules have the structured format with $genes
     if (is.list(modules[[1]]) && "genes" %in% names(modules[[1]])) {
       # Handle structured format: list of lists with $module_id and $genes
       module_genes <- lapply(modules, function(x) intersect(x$genes, rownames(expr_mat)))
-      names(module_genes) <- sapply(modules, function(x) x$module_id[1])
+      names(module_genes) <- sapply(modules, function(x) {
+        if (!is.null(x$module_id)) x$module_id[1] else names(modules)[which(modules == x)[1]]
+      })
     } else {
       # Handle simple list format: list(module_name = c(genes...))
       module_genes <- lapply(modules, function(genes) intersect(genes, rownames(expr_mat)))
@@ -736,6 +800,9 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
     stop("No modules with sufficient genes (minimum ", min_genes, " genes)")
   }
 
+  # Check if progress package is available
+  has_progress <- requireNamespace("progress", quietly = TRUE)
+  
   message("Starting integrated analysis...")
   message("Input genes: ", nrow(expr_mat))
   message("Input samples: ", ncol(expr_mat))
@@ -750,15 +817,28 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
   message("\nRunning intra-module analysis...")
   intra_results <- list()
 
+  # Setup progress for intra-module
+  total_intra_modules <- sum(sapply(module_genes, length) >= 2)
+  if (has_progress && total_intra_modules > 0) {
+    pb_intra <- progress::progress_bar$new(
+      format = "  [:bar] :percent (:current/:total) ETA: :eta",
+      total = total_intra_modules, clear = FALSE, width = 60
+    )
+  }
+
+  intra_module_count <- 0
   for (module_name in names(module_genes)) {
     module_genes_list <- module_genes[[module_name]]
 
     if (length(module_genes_list) >= 2) {
+      intra_module_count <- intra_module_count + 1
+      if (has_progress && total_intra_modules > 0) pb_intra$tick()
+      
       # Run intra-gene pair analysis for this module
       intra_df <- intra_gene_pair(
         expression_matrix = expr_mat,
         sample_condition = sample_condition,
-        module_genes = module_genes_list
+        modules = list(list(genes = module_genes_list, module_id = module_name))
       )
 
       if (nrow(intra_df) > 0) {
@@ -784,9 +864,21 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
 
   # Generate all possible gene pairs between different modules
   module_names <- names(module_genes)
+  total_inter_pairs <- choose(length(module_names), 2)
+  
+  if (has_progress && total_inter_pairs > 0) {
+    pb_inter <- progress::progress_bar$new(
+      format = "  [:bar] :percent (:current/:total) ETA: :eta",
+      total = total_inter_pairs, clear = FALSE, width = 60
+    )
+  }
 
+  processed_inter_pairs <- 0
   for (i in 1:(length(module_names) - 1)) {
     for (j in (i + 1):length(module_names)) {
+      processed_inter_pairs <- processed_inter_pairs + 1
+      if (has_progress && total_inter_pairs > 0) pb_inter$tick()
+      
       module1_name <- module_names[i]
       module2_name <- module_names[j]
 
@@ -797,8 +889,10 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
       inter_df <- inter_gene_pair(
         expression_matrix = expr_mat,
         sample_condition = sample_condition,
-        module1_genes = module1_genes,
-        module2_genes = module2_genes
+        modules = list(
+          list(genes = module1_genes, module_id = module1_name),
+          list(genes = module2_genes, module_id = module2_name)
+        )
       )
 
       if (nrow(inter_df) > 0) {
@@ -810,29 +904,48 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
     }
   }
 
-  if (length(inter_results) > 0) {
-    results$inter_module_results <- do.call(rbind, inter_results)
-    message("Inter-module analysis completed: ", nrow(results$inter_module_results), " gene pairs")
-  } else {
-    results$inter_module_results <- data.frame()
-    message("No inter-module results generated")
-  }
-
   # 3. Module activity comparison
   message("\nRunning module activity comparison...")
-  activity_results <- module_activity_comparison(
-    expression_matrix = expr_mat,
-    sample_condition = sample_condition,
-    modules = module_genes,
-    module_pairs = module_pairs,
-    min_samples = min_samples,
-    activity_method = activity_method
-  )
-
-  if (nrow(activity_results) > 0) {
-    activity_results$comparison_type <- "module-activity"
-    results$module_activity_results <- activity_results
-    message("Module activity comparison completed: ", nrow(activity_results), " module pairs")
+  
+  # Use all specified activity methods
+  activity_methods <- activity_method
+  all_activity_results <- list()
+  
+  if (has_progress && length(activity_methods) > 0) {
+    pb_activity <- progress::progress_bar$new(
+      format = "  [:bar] :percent (:current/:total) ETA: :eta",
+      total = length(activity_methods), clear = FALSE, width = 60
+    )
+  }
+  
+  processed_methods <- 0
+  for (method in activity_methods) {
+    processed_methods <- processed_methods + 1
+    if (has_progress && length(activity_methods) > 0) pb_activity$tick()
+    
+    message("  Running module activity comparison with method: ", method)
+    activity_results <- module_activity_comparison(
+      expression_matrix = expr_mat,
+      sample_condition = sample_condition,
+      modules = module_genes,
+      module_pairs = module_pairs,
+      min_samples = min_samples,
+      activity_method = method
+    )
+    
+    if (nrow(activity_results) > 0) {
+      activity_results$comparison_type <- "module-activity"
+      activity_results$activity_method <- method
+      all_activity_results[[method]] <- activity_results
+      message("  Method ", method, " completed: ", nrow(activity_results), " module pairs")
+    } else {
+      message("  Method ", method, " completed: 0 module pairs")
+    }
+  }
+  
+  if (length(all_activity_results) > 0) {
+    results$module_activity_results <- do.call(rbind, all_activity_results)
+    message("Module activity comparison completed: ", nrow(results$module_activity_results), " total results across all methods")
   } else {
     results$module_activity_results <- data.frame()
     message("No module activity results generated")
@@ -882,7 +995,7 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
       case_samples = length(case_samples),
       control_samples = length(control_samples),
       valid_modules = length(module_genes),
-      analysis_method = activity_method
+      analysis_methods = activity_methods
     )
   )
 
