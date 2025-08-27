@@ -96,7 +96,7 @@ module_activity_comparison <- function(expression_matrix, sample_condition, modu
 
   # Check if progress package is available
   has_progress <- requireNamespace("progress", quietly = TRUE)
-  
+
   # Setup progress bar if available
   if (has_progress) {
     pb <- progress::progress_bar$new(
@@ -110,9 +110,9 @@ module_activity_comparison <- function(expression_matrix, sample_condition, modu
 
   for (i in seq_along(module_pairs)) {
     pair <- module_pairs[[i]]
-    
+
     if (has_progress) pb$tick()
-    
+
     if (length(pair) != 2) {
       warning("Each module pair must contain exactly 2 module names")
       next
@@ -290,7 +290,7 @@ intra_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
 
   # Check if progress package is available
   has_progress <- requireNamespace("progress", quietly = TRUE)
-  
+
   # Calculate total number of gene pairs for progress bar
   total_pairs <- 0
   for (module_name in names(module_genes)) {
@@ -299,7 +299,7 @@ intra_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
       total_pairs <- total_pairs + choose(length(available_genes), 2)
     }
   }
-  
+
   # Setup progress bar if available
   if (has_progress && total_pairs > 0) {
     pb <- progress::progress_bar$new(
@@ -327,7 +327,7 @@ intra_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
     for (pair in gene_pairs) {
       processed_pairs <- processed_pairs + 1
       if (has_progress && total_pairs > 0) pb$tick()
-      
+
       gene1 <- pair[1]
       gene2 <- pair[2]
 
@@ -366,34 +366,35 @@ intra_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
       # Fisher exact test with warning suppression
       fisher_result <- suppressWarnings(fisher.test(contingency_table))
 
-    # Calculate additional metrics
-    case_ratio <- sum(case_patterns$gene1_greater) / length(case_samples)
-    control_ratio <- sum(control_patterns$gene1_greater) / length(control_samples)
+      # Calculate additional metrics
+      case_ratio <- sum(case_patterns$gene1_greater) / length(case_samples)
+      control_ratio <- sum(control_patterns$gene1_greater) / length(control_samples)
 
-    case_cor <- cor(expr1_case, expr2_case, method = "pearson", use = "pairwise.complete.obs")
-    control_cor <- cor(expr1_control, expr2_control, method = "pearson", use = "pairwise.complete.obs")
+      case_cor <- cor(expr1_case, expr2_case, method = "pearson", use = "pairwise.complete.obs")
+      control_cor <- cor(expr1_control, expr2_control, method = "pearson", use = "pairwise.complete.obs")
 
-    # Calculate effect sizes
-    gene1_effect <- mean(expr1_case) - mean(expr1_control)
-    gene2_effect <- mean(expr2_case) - mean(expr2_control)
+      # Calculate effect sizes
+      gene1_effect <- mean(expr1_case) - mean(expr1_control)
+      gene2_effect <- mean(expr2_case) - mean(expr2_control)
 
-    results_list[[length(results_list) + 1]] <- data.frame(
-      activity_method = "Intra-Module",
-      event1 = gene1,
-      event2 = gene2,
-      event_name = module_name,
-      p_value = fisher_result$p.value,
-      odds_ratio = fisher_result$estimate,
-      case_pattern_ratio = case_ratio,
-      control_pattern_ratio = control_ratio,
-      case_correlation = case_cor,
-      control_correlation = control_cor,
-      correlation_change = case_cor - control_cor,
-      event1_effect_size = gene1_effect,
-      event2_effect_size = gene2_effect,
-      event_interaction = gene1_effect * gene2_effect,
-      stringsAsFactors = FALSE
-    )
+      results_list[[length(results_list) + 1]] <- data.frame(
+        activity_method = "Intra-Module",
+        event1 = gene1,
+        event2 = gene2,
+        event_name = module_name,
+        p_value = fisher_result$p.value,
+        odds_ratio = fisher_result$estimate,
+        case_pattern_ratio = case_ratio,
+        control_pattern_ratio = control_ratio,
+        case_correlation = case_cor,
+        control_correlation = control_cor,
+        correlation_change = case_cor - control_cor,
+        event1_effect_size = gene1_effect,
+        event2_effect_size = gene2_effect,
+        event_interaction = gene1_effect * gene2_effect,
+        stringsAsFactors = FALSE
+      )
+    }
   }
 
   if (length(results_list) == 0) {
@@ -485,7 +486,7 @@ inter_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
 
   # Check if progress package is available
   has_progress <- requireNamespace("progress", quietly = TRUE)
-  
+
   # Calculate total number of gene pairs for progress bar
   total_pairs <- 0
   for (pair in module_pairs) {
@@ -499,7 +500,7 @@ inter_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
       }
     }
   }
-  
+
   # Setup progress bar if available
   if (has_progress && total_pairs > 0) {
     pb <- progress::progress_bar$new(
@@ -549,7 +550,7 @@ inter_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
     for (i in 1:nrow(gene_pairs)) {
       processed_pairs <- processed_pairs + 1
       if (has_progress && total_pairs > 0) pb$tick()
-      
+
       gene1 <- gene_pairs$module1[i]
       gene2 <- gene_pairs$module2[i]
 
@@ -775,7 +776,7 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
     stop("Insufficient samples in one or both conditions")
   }
 
-# Extract gene lists from module structure
+  # Extract gene lists from module structure
   if (is.list(modules) && length(modules) > 0) {
     # Check if modules have the structured format with $genes
     if (is.list(modules[[1]]) && "genes" %in% names(modules[[1]])) {
@@ -800,58 +801,25 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
     stop("No modules with sufficient genes (minimum ", min_genes, " genes)")
   }
 
-  # Check if progress package is available
-  has_progress <- requireNamespace("progress", quietly = TRUE)
-  
+
   message("Starting integrated analysis...")
   message("Input genes: ", nrow(expr_mat))
   message("Input samples: ", ncol(expr_mat))
   message("Valid modules: ", length(module_genes))
   message("Case samples: ", length(case_samples))
   message("Control samples: ", length(control_samples))
-
+  has_progress <- requireNamespace("progress", quietly = TRUE)
   # Initialize results list
   results <- list()
 
   # 1. Intra-module analysis
   message("\nRunning intra-module analysis...")
-  intra_results <- list()
+  intra_results <- intra_gene_pair(expr_mat, sample_condition, modules)
 
-  # Setup progress for intra-module
-  total_intra_modules <- sum(sapply(module_genes, length) >= 2)
-  if (has_progress && total_intra_modules > 0) {
-    pb_intra <- progress::progress_bar$new(
-      format = "  [:bar] :percent (:current/:total) ETA: :eta",
-      total = total_intra_modules, clear = FALSE, width = 60
-    )
-  }
 
-  intra_module_count <- 0
-  for (module_name in names(module_genes)) {
-    module_genes_list <- module_genes[[module_name]]
-
-    if (length(module_genes_list) >= 2) {
-      intra_module_count <- intra_module_count + 1
-      if (has_progress && total_intra_modules > 0) pb_intra$tick()
-      
-      # Run intra-gene pair analysis for this module
-      intra_df <- intra_gene_pair(
-        expression_matrix = expr_mat,
-        sample_condition = sample_condition,
-        modules = list(list(genes = module_genes_list, module_id = module_name))
-      )
-
-      if (nrow(intra_df) > 0) {
-        intra_df$comparison_type <- "intra-module"
-        intra_df$module1 <- module_name
-        intra_df$module2 <- module_name
-        intra_results[[module_name]] <- intra_df
-      }
-    }
-  }
 
   if (length(intra_results) > 0) {
-    results$intra_module_results <- do.call(rbind, intra_results)
+    results$intra_module_results <- intra_results
     message("Intra-module analysis completed: ", nrow(results$intra_module_results), " gene pairs")
   } else {
     results$intra_module_results <- data.frame()
@@ -860,89 +828,55 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
 
   # 2. Inter-module analysis
   message("\nRunning inter-module analysis...")
-  inter_results <- list()
-
-  # Generate all possible gene pairs between different modules
-  module_names <- names(module_genes)
-  total_inter_pairs <- choose(length(module_names), 2)
-  
-  if (has_progress && total_inter_pairs > 0) {
-    pb_inter <- progress::progress_bar$new(
-      format = "  [:bar] :percent (:current/:total) ETA: :eta",
-      total = total_inter_pairs, clear = FALSE, width = 60
-    )
+  inter_results <- inter_gene_pair(expr_mat, sample_condition, modules)
+  if (length(inter_results) > 0) {
+    results$inter_module_results <- inter_results
+    message("Inter-module analysis completed: ", nrow(results$inter_module_results), " gene pairs")
+  } else {
+    results$inter_module_results <- data.frame()
+    message("No inter-module results generated")
   }
 
-  processed_inter_pairs <- 0
-  for (i in 1:(length(module_names) - 1)) {
-    for (j in (i + 1):length(module_names)) {
-      processed_inter_pairs <- processed_inter_pairs + 1
-      if (has_progress && total_inter_pairs > 0) pb_inter$tick()
-      
-      module1_name <- module_names[i]
-      module2_name <- module_names[j]
-
-      module1_genes <- module_genes[[module1_name]]
-      module2_genes <- module_genes[[module2_name]]
-
-      # Run inter-gene pair analysis
-      inter_df <- inter_gene_pair(
-        expression_matrix = expr_mat,
-        sample_condition = sample_condition,
-        modules = list(
-          list(genes = module1_genes, module_id = module1_name),
-          list(genes = module2_genes, module_id = module2_name)
-        )
-      )
-
-      if (nrow(inter_df) > 0) {
-        inter_df$comparison_type <- "inter-module"
-        inter_df$module1 <- module1_name
-        inter_df$module2 <- module2_name
-        inter_results[[paste(module1_name, module2_name, sep = "_")]] <- inter_df
-      }
-    }
-  }
 
   # 3. Module activity comparison
   message("\nRunning module activity comparison...")
-  
+
   # Use all specified activity methods
   activity_methods <- activity_method
   all_activity_results <- list()
-  
+
   if (has_progress && length(activity_methods) > 0) {
     pb_activity <- progress::progress_bar$new(
       format = "  [:bar] :percent (:current/:total) ETA: :eta",
       total = length(activity_methods), clear = FALSE, width = 60
     )
   }
-  
+
   processed_methods <- 0
   for (method in activity_methods) {
     processed_methods <- processed_methods + 1
     if (has_progress && length(activity_methods) > 0) pb_activity$tick()
-    
+
     message("  Running module activity comparison with method: ", method)
     activity_results <- module_activity_comparison(
       expression_matrix = expr_mat,
       sample_condition = sample_condition,
-      modules = module_genes,
+      modules = modules,
       module_pairs = module_pairs,
       min_samples = min_samples,
       activity_method = method
     )
-    
+
     if (nrow(activity_results) > 0) {
-      activity_results$comparison_type <- "module-activity"
-      activity_results$activity_method <- method
+      # activity_results$comparison_type <- "module-activity"
+      # activity_results$activity_method <- method
       all_activity_results[[method]] <- activity_results
       message("  Method ", method, " completed: ", nrow(activity_results), " module pairs")
     } else {
       message("  Method ", method, " completed: 0 module pairs")
     }
   }
-  
+
   if (length(all_activity_results) > 0) {
     results$module_activity_results <- do.call(rbind, all_activity_results)
     message("Module activity comparison completed: ", nrow(results$module_activity_results), " total results across all methods")
@@ -967,28 +901,11 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
     stringsAsFactors = FALSE
   )
 
-  # Module involvement summary
-  all_modules <- unique(c(
-    results$intra_module_results$module1,
-    results$inter_module_results$module1,
-    results$inter_module_results$module2,
-    results$module_activity_results$module1,
-    results$module_activity_results$module2
-  ))
-  all_modules <- all_modules[all_modules != ""]
 
-  module_summary <- data.frame(
-    module = all_modules,
-    involved_in_intra = all_modules %in% unique(results$intra_module_results$module1),
-    involved_in_inter = all_modules %in% unique(c(results$inter_module_results$module1, results$inter_module_results$module2)),
-    involved_in_activity = all_modules %in% unique(c(results$module_activity_results$module1, results$module_activity_results$module2)),
-    stringsAsFactors = FALSE
-  )
 
   # Store summary
   results$summary <- list(
     overall_summary = summary_df,
-    module_involvement = module_summary,
     input_parameters = list(
       total_genes = nrow(expr_mat),
       total_samples = ncol(expr_mat),
@@ -1013,7 +930,6 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
   message("  Intra-module pairs: ", nrow(results$intra_module_results))
   message("  Inter-module pairs: ", nrow(results$inter_module_results))
   message("  Module activity comparisons: ", nrow(activity_results))
-  message("  Modules involved: ", nrow(module_summary))
 
   return(results)
 }

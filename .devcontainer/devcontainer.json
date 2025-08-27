@@ -1,6 +1,6 @@
 {
   "name": "MPAGE R Development Environment",
-  "image": "btrspg/env-mpage:20250813",
+  "image": "btrspg/env-mpage:20250825",
   "features": {},
   "mounts": [
     "source=${localWorkspaceFolder}/,target=/home/vscode/workspace/,type=bind,consistency=cached"
@@ -20,7 +20,8 @@
         "REditorSupport.r",
         "redhat.vscode-yaml",
         "ms-python.python",
-        "ms-toolsai.vscode-jupyter-powertoys"
+        "ms-toolsai.vscode-jupyter-powertoys",
+        "RDebugger.r-debugger"
       ]
     }
   },
