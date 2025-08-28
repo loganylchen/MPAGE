@@ -34,6 +34,8 @@ Imports:
     org.Hs.eg.db (>= 3.16.0),
     AnnotationDbi (>= 1.60.0),
     data.table (>= 1.14.0),
+    reshape2 (>= 1.4.0),
+    tools,
     stats,
     utils
 Suggests:
@@ -45,7 +47,8 @@ Suggests:
     RColorBrewer,
     circlize,
     visNetwork,
-    Cairo
+    Cairo,
+    progress (>= 1.2.0)
 VignetteBuilder: knitr
 URL: https://github.com/loganylchen/MPAGE
 BugReports: https://github.com/loganylchen/MPAGE/issues
