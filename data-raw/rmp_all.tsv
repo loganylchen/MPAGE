@@ -15,9 +15,8 @@ ALKBH1	m1A,m5C	eraser	m1A	eraser	35365216, 36467585
 YTHDF3	m1A,m6A	reader	m6A	reader	36467585, 38102645, 39072324
 FTO	m1A,m6A,m6Am	eraser	m6A	eraser	36467585, 38102645, 39072324, 38509021
 ALYREF	m5C	reader	m5C	reader	
-DNMT2	m5C	writer	m5C	writer	
-FMRP	m5C	reader	NA	NA	
-NSUN1	m5C	writer	m5C	writer	
+TRDMT1	m5C	writer	m5C	writer	
+NOP2	m5C	writer	m5C	writer	
 NSUN2	m5C	writer	m5C	writer	
 NSUN3	m5C	writer	m5C	writer	
 NSUN4	m5C	writer	m5C	writer	
@@ -33,12 +32,10 @@ YBX1	m5C	reader	m5C	reader
 YBX2	m5C	reader	NA	NA	
 ALKBH5	m6A	eraser	m6A	eraser	
 CBLL1	m6A	writer	NA	NA	
-eIF3	m6A	reader	NA	NA	
-FMR1	m6A	reader	NA	NA	
-HNRNPA2	m6A	reader	NA	NA	
+EIF3A	m6A	reader	NA	NA	
+FMR1	m6A, m5C	reader	NA	NA	
 HNRNPA2B1	m6A	reader	m6A	reader	
 HNRNPC	m6A	reader	NA	NA	
-HNRNPG	m6A	reader	NA	NA	
 IGF2BP1	m6A	reader	m6A	reader	
 IGF2BP2	m6A	reader	m6A	reader	
 LRPPRC	m6A	reader	NA	NA	
@@ -60,14 +57,13 @@ IGF2BP3	m6A, m7G	reader	m6A	reader
 METTL4	m6Am	writer	NA	NA	
 PCF11	m6Am	reader	NA	NA	
 PCIF1	m6Am	writer	NA	NA	
-CBC	m7G	reader	NA	NA	
 NCBP1	m7G	reader	NA	NA	
 NCBP2	m7G	reader	NA	NA	
 METTL1	m7G	writer	NA	NA	
 QKI	m7G	reader	NA	NA	
 RNMT	m7G	writer	m7G	writer	
 TRMT112	m7G	writer	NA	NA	
-WBSCR22	m7G	writer	NA	NA	
+BUD23	m7G	writer	NA	NA	
 WDR4	m7G	writer	m7G	writer	
 ADAR	A-to-I editing	writer	A-to-I	writer	A-to-I editing of coding and non-coding RNAs by ADARs
 ADARB1	A-to-I editing	writer	A-to-I	writer	27893733
@@ -82,7 +78,6 @@ PUS10	Ψ	writer	NA	NA
 PUS3	Ψ	writer	Psi	writer	
 PUS7	Ψ	writer	Psi	writer	
 PUS7L	Ψ	writer	NA	NA	
-PUS9	Ψ	writer	NA	NA	
 RPUSD1	Ψ	writer	NA	NA	
 RPUSD2	Ψ	writer	NA	NA	
 RPUSD3	Ψ	writer	NA	NA	
