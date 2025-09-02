@@ -1,0 +1,91 @@
+Gene.name	RNA.modification.type	Protein.class	modification_type	functional_role	Reference
+NAT10	ac4C	writer	NA	NA	
+ALKBH3	m1A	eraser	m6A	eraser	
+ALKBH7	m1A	eraser	NA	NA	
+RRP8	m1A	writer	NA	NA	
+TRMT10B	m1A	writer	NA	NA	
+TRMT10C	m1A	writer	m1A	writer	
+TRMT6	m1A	writer	m1A	writer	
+TRMT61A	m1A	writer	m1A	writer	
+TRMT61B	m1A	writer	m1A	writer	
+YTHDC1	m1A, m6A	reader	m6A	reader	
+YTHDF1	m1A, m6A	reader	m6A	reader	
+YTHDF2	m1A, m6A, m5C	reader	m6A	reader	
+ALKBH1	m1A,m5C	eraser	m1A	eraser	35365216, 36467585
+YTHDF3	m1A,m6A	reader	m6A	reader	36467585, 38102645, 39072324
+FTO	m1A,m6A,m6Am	eraser	m6A	eraser	36467585, 38102645, 39072324, 38509021
+ALYREF	m5C	reader	m5C	reader	
+DNMT2	m5C	writer	m5C	writer	
+FMRP	m5C	reader	NA	NA	
+NSUN1	m5C	writer	m5C	writer	
+NSUN2	m5C	writer	m5C	writer	
+NSUN3	m5C	writer	m5C	writer	
+NSUN4	m5C	writer	m5C	writer	
+NSUN5	m5C	writer	m5C	writer	
+NSUN6	m5C	writer	m5C	writer	
+NSUN7	m5C	writer	m5C	writer	
+RAD52	m5C	reader	NA	NA	
+SRSF2	m5C	reader	NA	NA	
+TET1	m5C	eraser	m5C	eraser	
+TET2	m5C	eraser	m5C	eraser	
+TET3	m5C	eraser	m5C	eraser	
+YBX1	m5C	reader	m5C	reader	
+YBX2	m5C	reader	NA	NA	
+ALKBH5	m6A	eraser	m6A	eraser	
+CBLL1	m6A	writer	NA	NA	
+eIF3	m6A	reader	NA	NA	
+FMR1	m6A	reader	NA	NA	
+HNRNPA2	m6A	reader	NA	NA	
+HNRNPA2B1	m6A	reader	m6A	reader	
+HNRNPC	m6A	reader	NA	NA	
+HNRNPG	m6A	reader	NA	NA	
+IGF2BP1	m6A	reader	m6A	reader	
+IGF2BP2	m6A	reader	m6A	reader	
+LRPPRC	m6A	reader	NA	NA	
+METTL14	m6A	writer	m6A	writer	
+METTL16	m6A	writer	NA	NA	
+METTL3	m6A	writer	m6A	writer	38102645, 39072324
+METTL5	m6A	writer	NA	NA	
+PRRC2A	m6A	reader	NA	NA	
+RBM15	m6A	writer	m6A	writer	
+RBM15B	m6A	writer	m6A	writer	
+RBMX	m6A	reader	NA	NA	
+SND1	m6A	reader	NA	NA	
+VIRMA	m6A	writer	NA	NA	
+WTAP	m6A	writer	m6A	writer	
+YTHDC2	m6A	reader	m6A	reader	
+ZC3H13	m6A	writer	m6A	writer	
+ZCCHC4	m6A	writer	NA	NA	
+IGF2BP3	m6A, m7G	reader	m6A	reader	
+METTL4	m6Am	writer	NA	NA	
+PCF11	m6Am	reader	NA	NA	
+PCIF1	m6Am	writer	NA	NA	
+CBC	m7G	reader	NA	NA	
+NCBP1	m7G	reader	NA	NA	
+NCBP2	m7G	reader	NA	NA	
+METTL1	m7G	writer	NA	NA	
+QKI	m7G	reader	NA	NA	
+RNMT	m7G	writer	m7G	writer	
+TRMT112	m7G	writer	NA	NA	
+WBSCR22	m7G	writer	NA	NA	
+WDR4	m7G	writer	m7G	writer	
+ADAR	A-to-I editing	writer	A-to-I	writer	A-to-I editing of coding and non-coding RNAs by ADARs
+ADARB1	A-to-I editing	writer	A-to-I	writer	27893733
+ADARB2	A-to-I editing	writer	A-to-I	writer	
+DNMT1	m5C	writer	m5C	writer	
+DNMT3A	m5C	writer	m5C	writer	
+DNMT3B	m5C	writer	m5C	writer	
+EIF4E	m7G	reader	m7G	reader	
+DKC1	Ψ	writer	Psi	writer	
+PUS1	Ψ	writer	Psi	writer	
+PUS10	Ψ	writer	NA	NA	
+PUS3	Ψ	writer	Psi	writer	
+PUS7	Ψ	writer	Psi	writer	
+PUS7L	Ψ	writer	NA	NA	
+PUS9	Ψ	writer	NA	NA	
+RPUSD1	Ψ	writer	NA	NA	
+RPUSD2	Ψ	writer	NA	NA	
+RPUSD3	Ψ	writer	NA	NA	
+RPUSD4	Ψ	writer	Psi	writer	
+TRUB1	Ψ	writer	Psi	writer	
+TRUB2	Ψ	writer	Psi	writer	
