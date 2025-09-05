@@ -82,7 +82,7 @@ build_ppi_network <- function(data_sources = c("STRING", "BIOGRID", "INTACT"),
     )
 
     # Add edge attributes
-    igraph::E(network)$source <- "STRING"
+    igraph::E(network)$source <- source
 
     cat("Nodes:", length(igraph::V(network)), "\n")
     cat("Edges:", length(igraph::E(network)), "\n")
