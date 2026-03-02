@@ -337,7 +337,7 @@ print_enrichment_summary <- function(enrichment_results, top_n = 10) {
       # Show top results
       top_results <- head(results[order(results$pvalue), ], top_n)
 
-      for (i in 1:nrow(top_results)) {
+      for (i in seq_len(nrow(top_results))) {
         row <- top_results[i, ]
         msg <- sprintf(
           "%d. %s (p=%.2e, q=%.2e, genes=%d)",

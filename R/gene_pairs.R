@@ -582,7 +582,7 @@ inter_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
     # Generate all possible gene pairs between modules
     gene_pairs <- expand.grid(module1 = module1_available, module2 = module2_available, stringsAsFactors = FALSE)
 
-    for (i in 1:nrow(gene_pairs)) {
+    for (i in seq_len(nrow(gene_pairs))) {
       processed_pairs <- processed_pairs + 1
       if (has_progress && total_pairs > 0) pb$tick()
 
