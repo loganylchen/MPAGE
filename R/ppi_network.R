@@ -253,7 +253,7 @@ merge_ppi_networks <- function(networks, merge_method = "union", add_source_labe
     print(source_summary)
 
     # Multi-source interactions
-    multi_source <- sapply(source_list, length) > 1
+    multi_source <- lengths(source_list) > 1
     message(sprintf(
       "Interactions from multiple sources: %d (%.1f%%)",
       sum(multi_source), 100 * sum(multi_source) / nrow(merged_edges)

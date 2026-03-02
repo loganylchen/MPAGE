@@ -112,14 +112,14 @@ run_mpage <- function(expression_data, sample_condition, modules = NULL,
 
   # Filter modules with sufficient genes
   min_genes <- 3
-  valid_modules <- module_genes[sapply(module_genes, length) >= min_genes]
+  valid_modules <- module_genes[lengths(module_genes) >= min_genes]
 
   if (length(valid_modules) == 0) {
     stop("No modules with sufficient genes (minimum ", min_genes, " genes)")
   }
 
   message("Valid modules after filtering: ", length(valid_modules))
-  message("Genes per valid module: ", paste(sapply(valid_modules, length), collapse = ", "))
+  message("Genes per valid module: ", paste(lengths(valid_modules), collapse = ", "))
 
   # Run comprehensive analysis
   message("\n=== Starting Comprehensive Analysis ===")

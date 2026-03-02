@@ -421,12 +421,12 @@ plot_network_comparison <- function(networks_list, network_names = NULL,
   # Calculate network metrics
   metrics <- data.frame(
     Network = network_names,
-    Nodes = sapply(networks_list, igraph::vcount),
-    Edges = sapply(networks_list, igraph::ecount),
-    Density = sapply(networks_list, igraph::edge_density),
-    Avg_Degree = sapply(networks_list, function(x) mean(igraph::degree(x))),
-    Diameter = sapply(networks_list, function(x) igraph::diameter(x, directed = FALSE)),
-    Clustering = sapply(networks_list, igraph::transitivity, type = "global")
+    Nodes = vapply(networks_list, igraph::vcount, integer(1)),
+    Edges = vapply(networks_list, igraph::ecount, integer(1)),
+    Density = vapply(networks_list, igraph::edge_density, numeric(1)),
+    Avg_Degree = vapply(networks_list, function(x) mean(igraph::degree(x)), numeric(1)),
+    Diameter = vapply(networks_list, function(x) igraph::diameter(x, directed = FALSE), numeric(1)),
+    Clustering = vapply(networks_list, igraph::transitivity, numeric(1), type = "global")
   )
 
   # Create comparison plots

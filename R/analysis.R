@@ -205,7 +205,7 @@ score_modules <- function(expression_data, modules,
   names(gene_sets) <- sapply(modules, function(m) m$module_id)
   
   # Remove empty gene sets
-  gene_sets <- gene_sets[sapply(gene_sets, length) > 0]
+  gene_sets <- gene_sets[lengths(gene_sets) > 0]
   
   if (length(gene_sets) == 0) {
     warning("No valid gene sets found")

@@ -90,7 +90,7 @@ module_activity_comparison <- function(expression_matrix, sample_condition, modu
 
   # Remove empty modules and modules with too few genes
   min_genes <- 3
-  module_genes <- module_genes[sapply(module_genes, length) >= min_genes]
+  module_genes <- module_genes[lengths(module_genes) >= min_genes]
 
   if (length(module_genes) < 2) {
     warning("Fewer than 2 modules with sufficient genes (minimum ", min_genes, " genes)")
@@ -306,7 +306,7 @@ intra_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
 
   # Remove empty modules and modules with too few genes
   min_genes <- 3
-  module_genes <- module_genes[sapply(module_genes, length) >= min_genes]
+  module_genes <- module_genes[lengths(module_genes) >= min_genes]
 
 
 
@@ -834,7 +834,7 @@ final_integrated_analysis <- function(expression_matrix, sample_condition, modul
 
   # Remove empty modules and modules with too few genes
   min_genes <- 3
-  module_genes <- module_genes[sapply(module_genes, length) >= min_genes]
+  module_genes <- module_genes[lengths(module_genes) >= min_genes]
 
   if (length(module_genes) < 1) {
     stop("No modules with sufficient genes (minimum ", min_genes, " genes)")
