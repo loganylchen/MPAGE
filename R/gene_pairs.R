@@ -210,7 +210,7 @@ module_activity_comparison <- function(expression_matrix, sample_condition, modu
 #'
 #' @param expression_matrix Gene expression matrix (genes as rows, samples as columns)
 #' @param sample_condition Named vector indicating sample conditions ("case" or "control")
-#' @param module_genes Vector of gene symbols in the module
+#' @param modules List of modules, each containing genes (e.g., list(module1 = c("gene1", "gene2")))
 #' @param min_samples Minimum samples per condition for valid analysis (default: 3)
 #'
 #' @return Data frame with intra-module gene pair analysis results
@@ -232,8 +232,13 @@ module_activity_comparison <- function(expression_matrix, sample_condition, modu
 #'   sample_9 = "control", sample_10 = "control"
 #' )
 #'
+#' # Define modules
+#' test_modules <- list(
+#'   module1 = c("gene_1", "gene_2", "gene_3")
+#' )
+#'
 #' # Analyze intra-module pairs
-#' results <- intra_gene_pair(expr_mat, conditions, c("gene_1", "gene_2", "gene_3"))
+#' results <- intra_gene_pair(expr_mat, conditions, test_modules)
 #' }
 intra_gene_pair <- function(expression_matrix, sample_condition, modules, min_samples = 3) {
   # Input validation
@@ -416,8 +421,7 @@ intra_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
 #'
 #' @param expression_matrix Gene expression matrix (genes as rows, samples as columns)
 #' @param sample_condition Named vector indicating sample conditions ("case" or "control")
-#' @param module1_genes Vector of gene symbols in the first module
-#' @param module2_genes Vector of gene symbols in the second module
+#' @param modules List of modules, each containing genes (e.g., list(module1 = c("gene1", "gene2"), module2 = c("gene3", "gene4")))
 #' @param min_samples Minimum samples per condition for valid analysis (default: 3)
 #'
 #' @return Data frame with inter-module gene pair analysis results
@@ -439,13 +443,14 @@ intra_gene_pair <- function(expression_matrix, sample_condition, modules, min_sa
 #'   sample_9 = "control", sample_10 = "control"
 #' )
 #'
-#' # Analyze inter-module pairs
-#' results <- inter_gene_pair(
-#'   expr_mat,
-#'   conditions,
-#'   c("gene_1", "gene_2", "gene_3"),
-#'   c("gene_4", "gene_5", "gene_6")
+#' # Define modules
+#' test_modules <- list(
+#'   module1 = c("gene_1", "gene_2", "gene_3"),
+#'   module2 = c("gene_4", "gene_5", "gene_6")
 #' )
+#'
+#' # Analyze inter-module pairs
+#' results <- inter_gene_pair(expr_mat, conditions, test_modules)
 #' }
 inter_gene_pair <- function(expression_matrix, sample_condition, modules, min_samples = 3) {
   # Input validation
