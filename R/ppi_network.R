@@ -4,9 +4,12 @@ set.seed(422)
 #' Construct protein-protein interaction network from multiple data sources using unified interface
 #'
 #' @param data_sources Character vector of data sources to use ("STRING", "BIOGRID", "INTACT")
-#' @param filters
-#' @param versions
-#' @param processed_dir
+#' @param filters List of filtering criteria for each data source. Named list with elements
+#'   'string' (numeric score threshold, default: 700), 'intact' (numeric score threshold, default: 0.7),
+#'   'biogrid' (character vector of evidence types, default: c("physical"))
+#' @param versions List of database versions to use. Named list with elements 'string', 'intact',
+#'   'biogrid' specifying version strings for each database
+#' @param processed_dir Character string specifying directory path for processed data files (default: "./")
 #' @param species Character string specifying species taxonomy ID (default: "9606")
 #'
 #' @return An igraph object representing the PPI network
