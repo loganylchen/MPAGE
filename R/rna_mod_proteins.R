@@ -85,7 +85,7 @@ get_rna_mod_proteins <- function(use_built_in = TRUE,
     stop("Built-in RNA modification protein database not found")
   }
 
-  proteins <- readRDS(protein_data, )
+  proteins <- readRDS(protein_data)
 
   # Return all columns from built-in database
   result <- proteins[, c(
