@@ -1,6 +1,6 @@
 {
   "name": "MPAGE R Development Environment",
-  "image": "btrspg/env-mpage:20250825",
+  "image": "btrspg/env-mpage:20250901",
   "features": {},
   "mounts": [
     "source=${localWorkspaceFolder}/,target=/home/vscode/workspace/,type=bind,consistency=cached"
