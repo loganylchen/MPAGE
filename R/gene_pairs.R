@@ -13,6 +13,36 @@
 #'
 #' @return Data frame with module activity comparison results including Fisher test statistics
 #'
+#' @examples
+#' \dontrun{
+#' # Create sample expression data
+#' expr_mat <- matrix(rnorm(1000), nrow = 100, ncol = 10)
+#' colnames(expr_mat) <- paste0("sample_", 1:10)
+#' rownames(expr_mat) <- paste0("gene_", 1:100)
+#'
+#' # Define conditions
+#' conditions <- c(
+#'   sample_1 = "case", sample_2 = "case", sample_3 = "case",
+#'   sample_4 = "case", sample_5 = "case",
+#'   sample_6 = "control", sample_7 = "control", sample_8 = "control",
+#'   sample_9 = "control", sample_10 = "control"
+#' )
+#'
+#' # Define modules
+#' test_modules <- list(
+#'   module1 = list(module_id = "module1", genes = paste0("gene_", 1:10)),
+#'   module2 = list(module_id = "module2", genes = paste0("gene_", 11:20))
+#' )
+#'
+#' # Compare module activity
+#' results <- module_activity_comparison(
+#'   expression_matrix = expr_mat,
+#'   sample_condition = conditions,
+#'   modules = test_modules,
+#'   activity_method = "zscore"
+#' )
+#' }
+#'
 #' @export
 #'
 module_activity_comparison <- function(expression_matrix, sample_condition, modules,

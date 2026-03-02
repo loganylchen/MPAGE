@@ -300,6 +300,17 @@ functional_enrichment <- function(gene_set,
 #'
 #' @param enrichment_results Results from functional_enrichment function
 #' @param top_n Number of top results to display (default: 10)
+#'
+#' @examples
+#' \dontrun{
+#' # Run enrichment analysis first
+#' genes <- c("TP53", "BRCA1", "BRCA2", "ATM", "CHEK2")
+#' results <- functional_enrichment(gene_set = genes)
+#'
+#' # Print summary
+#' print_enrichment_summary(results, top_n = 5)
+#' }
+#'
 #' @export
 print_enrichment_summary <- function(enrichment_results, top_n = 10) {
   if (is.null(enrichment_results)) {
@@ -351,6 +362,18 @@ print_enrichment_summary <- function(enrichment_results, top_n = 10) {
 #' @param enrichment_results Results from functional_enrichment function
 #' @param database Database to plot ("kegg", "go_bp", or "wikipathways")
 #' @param top_n Number of top pathways to display (default: 20)
+#'
+#' @examples
+#' \dontrun{
+#' # Run enrichment analysis first
+#' genes <- c("TP53", "BRCA1", "BRCA2", "ATM", "CHEK2")
+#' results <- functional_enrichment(gene_set = genes)
+#'
+#' # Plot KEGG results
+#' p <- plot_enrichment_results(results, database = "kegg", top_n = 10)
+#' print(p)
+#' }
+#'
 #' @export
 plot_enrichment_results <- function(enrichment_results, database = "kegg", top_n = 20) {
   if (!database %in% c("kegg", "go_bp", "wikipathways")) {

@@ -292,6 +292,21 @@ visualize_ppi_network <- function(network,
 #' @param height Plot height in inches
 #'
 #' @return List of ggplot objects
+#'
+#' @examples
+#' \dontrun{
+#' # Create a sample network
+#' library(igraph)
+#' g <- erdos.renyi.game(50, 0.1)
+#' V(g)$name <- paste0("GENE", 1:50)
+#'
+#' # Generate summary plots
+#' plots <- plot_network_summary(g)
+#'
+#' # Display degree distribution
+#' print(plots$degree_distribution)
+#' }
+#'
 #' @export
 plot_network_summary <- function(network, save_path = NULL, width = 8, height = 6) {
   if (!igraph::is.igraph(network)) {
@@ -374,6 +389,24 @@ plot_network_summary <- function(network, save_path = NULL, width = 8, height = 
 #' @param height Plot height in inches
 #'
 #' @return ggplot object
+#'
+#' @examples
+#' \dontrun{
+#' # Create sample networks
+#' library(igraph)
+#' net1 <- erdos.renyi.game(50, 0.1)
+#' net2 <- erdos.renyi.game(60, 0.15)
+#'
+#' # Compare networks
+#' plots <- plot_network_comparison(
+#'   networks_list = list(net1, net2),
+#'   network_names = c("Network 1", "Network 2")
+#' )
+#'
+#' # Display comparison
+#' print(plots$density)
+#' }
+#'
 #' @export
 plot_network_comparison <- function(networks_list, network_names = NULL,
                                     save_path = NULL, width = 12, height = 8) {
