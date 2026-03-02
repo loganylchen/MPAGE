@@ -1,0 +1,93 @@
+Gene name	RNA modification type	Protein class
+METTL3	m6A	writer
+METTL14	m6A	writer
+METTL16	m6A	writer
+RBM15	m6A	writer
+RBM15B	m6A	writer
+VIRMA (KIAA1429)	m6A	writer
+WTAP	m6A	writer
+ZC3H13	m6A	writer
+CBLL1 (HAKAI)	m6A	writer
+ZCCHC4	m6A	writer
+METTL5	m6A	writer
+ALKBH5	m6A	eraser
+FTO	m6A	eraser
+YTHDC1	m6A	reader
+YTHDC2	m6A	reader
+YTHDF1	m6A	reader
+YTHDF2	m6A	reader
+YTHDF3	m6A	reader
+IGF2BP1	m6A	reader
+IGF2BP2	m6A	reader
+IGF2BP3	m6A	reader
+HNRNPC	m6A	reader
+HNRNPA2	m6A	reader
+HNRNPG	m6A	reader
+FMR1	m6A	reader
+RBMX	m6A	reader
+LRPPRC	m6A	reader
+eIF3	m6A	reader
+PRRC2A	m6A	reader
+SND1	m6A	reader
+PCIF1 (CAPAM)	m6Am	writer
+METTL4	m6Am	writer
+FTO	m6Am	eraser
+PCF11	m6Am	reader
+TRMT6	m1A	writer
+TRMT61A	m1A	writer
+TRMT61B	m1A	writer
+TRMT10B	m1A	writer
+TRMT10C	m1A	writer
+NML (RRP8)	m1A	writer
+ALKBH1	m1A	eraser
+ALKBH3	m1A	eraser
+ALKBH7	m1A	eraser
+FTO	m1A	eraser
+YTHDF1	m1A	reader
+YTHDF2	m1A	reader
+YTHDF3	m1A	reader
+YTHDC1	m1A	reader
+NSUN1	m5C	writer
+NSUN2	m5C	writer
+NSUN3	m5C	writer
+NSUN4	m5C	writer
+NSUN5	m5C	writer
+NSUN6	m5C	writer
+NSUN7	m5C	writer
+DNMT2	m5C	writer
+NSUN5a/b/c	m5C	writer
+ALKBH1	m5C	eraser
+TET1	m5C	eraser
+TET2	m5C	eraser
+TET3	m5C	eraser
+ALYREF	m5C	reader
+YBX1	m5C	reader
+YBX2	m5C	reader
+YTHDF2	m5C	reader
+RAD52	m5C	reader
+FMRP	m5C	reader
+SRSF2	m5C	reader
+NAT10	ac4C	writer
+METTL1/WDR4	m7G	writer
+WBSCR22/TRMT112	m7G	writer
+RNMT	m7G	writer
+QKI	m7G	reader
+IGF2BP3	m7G	reader
+eIF4E	m7G	reader
+CBC (NCBP1/2)	m7G	reader
+DKC1	Ψ	writer
+PUS1	Ψ	writer
+PUS3	Ψ	writer
+PUS7	Ψ	writer
+PUS7L	Ψ	writer
+PUS9	Ψ	writer
+PUS10	Ψ	writer
+RPUSD1	Ψ	writer
+RPUSD2	Ψ	writer
+RPUSD3	Ψ	writer
+RPUSD4	Ψ	writer
+TRUB1	Ψ	writer
+TRUB2	Ψ	writer
+ADAR1	A-to-I editing	writer
+ADAR2	A-to-I editing	writer
+ADAR3	A-to-I editing	writer
