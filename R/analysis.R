@@ -1,3 +1,6 @@
+#' @importFrom rlang `%||%`
+NULL
+
 #' Classify Modules
 #'
 #' Classify modules by modification type or functional role
