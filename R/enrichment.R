@@ -303,23 +303,23 @@ functional_enrichment <- function(gene_set,
 #' @export
 print_enrichment_summary <- function(enrichment_results, top_n = 10) {
   if (is.null(enrichment_results)) {
-    cat("No enrichment results available.\n")
+    message("No enrichment results available.")
     return(invisible(NULL))
   }
 
-  cat("=== Functional Enrichment Analysis Summary ===\n")
-  cat(sprintf("Input genes: %d\n", enrichment_results$summary$input_genes))
-  cat(sprintf("Mapped genes: %d\n", enrichment_results$summary$mapped_genes))
-  cat(sprintf("Organism: %s\n", enrichment_results$summary$organism))
-  cat("\n")
+  message("=== Functional Enrichment Analysis Summary ===")
+  message(sprintf("Input genes: %d", enrichment_results$summary$input_genes))
+  message(sprintf("Mapped genes: %d", enrichment_results$summary$mapped_genes))
+  message(sprintf("Organism: %s", enrichment_results$summary$organism))
+  message("")
 
   databases <- c("kegg", "go_bp", "wikipathways")
 
   for (db in databases) {
     results <- enrichment_results[[db]]
     if (!is.null(results) && nrow(results) > 0) {
-      cat(sprintf(
-        "=== %s Enrichment (%d significant pathways) ===\n",
+      message(sprintf(
+        "=== %s Enrichment (%d significant pathways) ===",
         toupper(db), nrow(results)
       ))
 
@@ -328,20 +328,20 @@ print_enrichment_summary <- function(enrichment_results, top_n = 10) {
 
       for (i in 1:nrow(top_results)) {
         row <- top_results[i, ]
-        cat(sprintf(
+        msg <- sprintf(
           "%d. %s (p=%.2e, q=%.2e, genes=%d)",
           i, row$Description, row$pvalue, row$p.adjust, row$Count
-        ))
+        )
 
         if (enrichment_results$summary$results_count[[db]] > 0 &&
           "has_key_proteins" %in% colnames(top_results) && row$has_key_proteins) {
-          cat(sprintf(" [Key proteins: %s]", row$key_proteins_found))
+          msg <- paste0(msg, sprintf(" [Key proteins: %s]", row$key_proteins_found))
         }
-        cat("\n")
+        message(msg)
       }
-      cat("\n")
+      message("")
     } else {
-      cat(sprintf("=== %s Enrichment (No significant pathways) ===\n", toupper(db)))
+      message(sprintf("=== %s Enrichment (No significant pathways) ===", toupper(db)))
     }
   }
 }

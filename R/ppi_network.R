@@ -71,7 +71,7 @@ build_ppi_network <- function(data_sources = c("STRING", "BIOGRID", "INTACT"),
       stop(sprintf("Processing %s data not exists: %s", source, processed_file_name))
     }
     processed_df <- readRDS(processed_file)
-    cat(sprintf("%s Network Summary:\n", source))
+    message(sprintf("%s Network Summary:", source))
     message(sprintf("Processed %d unique interactions", nrow(processed_df)))
     message(sprintf("Unique proteins: %d", length(unique(c(processed_df$gene1, processed_df$gene2)))))
     if (is.numeric(filters[[tolower(source)]])) {
@@ -87,9 +87,9 @@ build_ppi_network <- function(data_sources = c("STRING", "BIOGRID", "INTACT"),
     # Add edge attributes
     igraph::E(network)$source <- source
 
-    cat("Nodes:", length(igraph::V(network)), "\n")
-    cat("Edges:", length(igraph::E(network)), "\n")
-    cat("Average degree:", mean(igraph::degree(network)), "\n")
+    message(sprintf("Nodes: %d", length(igraph::V(network))))
+    message(sprintf("Edges: %d", length(igraph::E(network))))
+    message(sprintf("Average degree: %.2f", mean(igraph::degree(network))))
     networks[[tolower(source)]] <- network
   }
 
@@ -238,25 +238,25 @@ merge_ppi_networks <- function(networks, merge_method = "union", add_source_labe
   igraph::V(merged_network)$degree <- igraph::degree(merged_network)
 
   # Summary statistics
-  cat("=== Merged Network Summary ===\n")
-  cat(sprintf("Data sources: %s\n", paste(names(network_data), collapse = ", ")))
-  cat(sprintf("Merge method: %s\n", merge_method))
-  cat(sprintf("Total nodes: %d\n", igraph::vcount(merged_network)))
-  cat(sprintf("Total edges: %d\n", igraph::ecount(merged_network)))
-  cat(sprintf("Network density: %.4f\n", igraph::edge_density(merged_network)))
-  cat(sprintf("Average degree: %.2f\n", mean(igraph::degree(merged_network))))
+  message("=== Merged Network Summary ===")
+  message(sprintf("Data sources: %s", paste(names(network_data), collapse = ", ")))
+  message(sprintf("Merge method: %s", merge_method))
+  message(sprintf("Total nodes: %d", igraph::vcount(merged_network)))
+  message(sprintf("Total edges: %d", igraph::ecount(merged_network)))
+  message(sprintf("Network density: %.4f", igraph::edge_density(merged_network)))
+  message(sprintf("Average degree: %.2f", mean(igraph::degree(merged_network))))
 
   # Detailed source contribution analysis
   if (add_source_labels && "sources" %in% colnames(merged_edges)) {
     source_list <- strsplit(merged_edges$sources, ";")
     source_summary <- table(unlist(source_list))
-    cat("\n=== Source Contribution ===\n")
+    message("=== Source Contribution ===")
     print(source_summary)
 
     # Multi-source interactions
     multi_source <- sapply(source_list, length) > 1
-    cat(sprintf(
-      "\nInteractions from multiple sources: %d (%.1f%%)\n",
+    message(sprintf(
+      "Interactions from multiple sources: %d (%.1f%%)",
       sum(multi_source), 100 * sum(multi_source) / nrow(merged_edges)
     ))
   }
