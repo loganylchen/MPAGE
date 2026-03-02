@@ -1,4 +1,3 @@
-set.seed(422)
 #' Iterative Module Identification with Target Proteins
 #'
 #' Identify network modules using louvain and fast_greedy algorithms iteratively,

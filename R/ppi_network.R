@@ -1,4 +1,3 @@
-set.seed(422)
 #' Build PPI Network (Revised)
 #'
 #' Construct protein-protein interaction network from multiple data sources using unified interface

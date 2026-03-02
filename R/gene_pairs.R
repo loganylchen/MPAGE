@@ -1,4 +1,3 @@
-set.seed(422)
 #' Module Activity Comparison
 #'
 #' Compare module activity scores between case and control conditions using Fisher exact test.
