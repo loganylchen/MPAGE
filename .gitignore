@@ -1,0 +1,21 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Compiled files
+*.o
+*.so
+*.dll
+
+# R package build artifacts
+*.tar.gz
+*.Rcheck/
+
+# Environment files
+.renviron
+.rsconnect
+
+# OS files
+.DS_Store
+Thumbs.db

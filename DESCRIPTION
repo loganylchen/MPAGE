@@ -1,0 +1,17 @@
+Package: MPAGE
+Type: Package
+Title: Module-based Pair-wise Analysis of Gene Expression
+Version: 0.1.0
+Author: loganylchen
+Maintainer: loganylchen <your.email@example.com>
+Description: A complete workflow for analyzing RNA modification modules 
+    and their dynamic changes across samples. Implements module-based 
+    pair-wise analysis of gene expression with PPI network construction,
+    module identification, and quantification methods.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
