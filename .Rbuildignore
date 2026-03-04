@@ -1,0 +1,17 @@
+^testing\.ipynb$
+^testing4\.ipynb$
+^data-raw$
+^\.devcontainer$
+^\.github$
+^README\.Rmd$
+^README\.md$
+^CONTRIBUTING\.md$
+^codecov\.yml$
+^\.git$
+^\.gitignore$
+^\.RData$
+^\.Rhistory$
+^\.Rproj\.user$
+^.*\.Rproj$
+^LICENSE\.md$
+^nl-*
