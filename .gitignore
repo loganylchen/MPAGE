@@ -6,3 +6,10 @@ data-raw/BIOGRID-ALL-4.4.248.tab3.txt
 temp
 main_temp
 
+
+# Jupyter Notebooks
+*.ipynb
+*.ipynb_checkpoints/
+
+# But allow example notebooks
+!examples/*.ipynb

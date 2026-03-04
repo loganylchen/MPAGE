@@ -1,4 +1,3 @@
-set.seed(422)
 #' Build PPI Network (Revised)
 #'
 #' Construct protein-protein interaction network from multiple data sources using unified interface
@@ -52,7 +51,6 @@ build_ppi_network <- function(data_sources = c("STRING", "BIOGRID", "INTACT"),
 
   # Initialize networks list
   networks <- list()
-  processed_files <- list()
 
   # Process each data source
   for (source in data_sources) {
@@ -251,7 +249,7 @@ merge_ppi_networks <- function(networks, merge_method = "union", add_source_labe
     print(source_summary)
 
     # Multi-source interactions
-    multi_source <- sapply(source_list, length) > 1
+    multi_source <- vapply(source_list, length, integer(1)) > 1
     cat(sprintf(
       "\nInteractions from multiple sources: %d (%.1f%%)\n",
       sum(multi_source), 100 * sum(multi_source) / nrow(merged_edges)
