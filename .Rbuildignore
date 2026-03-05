@@ -1,0 +1,16 @@
+^AGENTS\.md$
+^SOUL\.md$
+^USER\.md$
+^TOOLS\.md$
+^IDENTITY\.md$
+^HEARTBEAT\.md$
+^memory$
+^skills$
+^docs/plans$
+^\.github$
+^_pkgdown\.yml$
+^\.travis\.yml$
+^appveyor\.yml$
+^codecov\.yml$
+^cran-comments\.md$
+^NEWS\.md$

@@ -1,21 +1,51 @@
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
+# R package files
+*.Rproj.user
+*.Rhistory
+*.RData
+*.Ruserdata
 
-# Compiled files
-*.o
-*.so
-*.dll
-
-# R package build artifacts
+# Build artifacts
 *.tar.gz
-*.Rcheck/
+*.tgz
+*.zip
+*.rds
+*.Rds
 
-# Environment files
-.renviron
-.rsconnect
+# Package build
+*.check
+*.Rcheck
+MPAGE*.tar.gz
+MPAGE*.tgz
 
-# OS files
+# Documentation
+docs/
+meta/
+man/*.Rd
+
+# Test artifacts
+tests/testthat/_snaps/
+tests/testthat/*.png
+tests/testthat/*.pdf
+
+# Coverage
+*.gcov
+*.gcno
+*.gcda
+codecov/
+
+# IDE
+.Rproj.user/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
 Thumbs.db
+
+# Temporary
+*.tmp
+*.temp
+*.log
