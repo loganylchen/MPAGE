@@ -3,7 +3,7 @@ Type: Package
 Title: Module-based Pair-wise Analysis of Gene Expression
 Version: 0.1.0
 Author: loganylchen
-Maintainer: loganylchen <your.email@example.com>
+Maintainer: loganylchen <yuelong.chen.btr@gmail.com>
 Description: A complete workflow for analyzing RNA modification modules 
     and their dynamic changes across samples. Implements module-based 
     pair-wise analysis of gene expression with PPI network construction,

@@ -3,7 +3,7 @@
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/loganylchen/MPAGE/workflows/R-CMD-check/badge.svg)](https://github.com/loganylchen/MPAGE/actions)
 [![Codecov test coverage](https://codecov.io/gh/loganylchen/MPAGE/branch/main/graph/badge.svg)](https://app.codecov.io/gh/loganylchen/MPAGE?branch=main)
-<!-- badges: end --
+<!-- badges: end -->
 
 The MPAGE package provides a complete workflow for analyzing RNA modification modules and their dynamic changes across samples. It implements a module-based pair-wise analysis of gene expression, integrating PPI network construction, module identification, and various quantification methods for module activity and gene pair relationships.
 
