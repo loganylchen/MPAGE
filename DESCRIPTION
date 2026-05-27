@@ -1,17 +1,54 @@
-Package: MPAGE
+Package: mpage
 Type: Package
 Title: Module-based Pair-wise Analysis of Gene Expression
-Version: 0.1.0
-Author: loganylchen
-Maintainer: loganylchen <your.email@example.com>
-Description: A complete workflow for analyzing RNA modification modules 
-    and their dynamic changes across samples. Implements module-based 
-    pair-wise analysis of gene expression with PPI network construction,
-    module identification, and quantification methods.
-License: MIT + file LICENSE
+Version: 1.0.0
+Description: Provides a complete workflow for analyzing RNA modification modules 
+    and their dynamic changes across samples. It implements a module-based 
+    pair-wise analysis of gene expression, integrating PPI network construction, 
+    module identification, and various quantification methods for module activity 
+    and gene pair relationships.
+License: MIT
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
-Suggests: 
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
+LazyDataCompression: xz
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends: 
+    R (>= 4.0.0)
+Imports:
+    igraph (>= 1.3.0),
+    STRINGdb (>= 2.0.0),
+    clusterProfiler (>= 4.0.0),
+    GSEABase (>= 1.56.0),
+    GSVA (>= 1.44.0),
+    cluster (>= 2.1.0),
+    ggplot2 (>= 3.4.0),
+    dplyr (>= 1.1.0),
+    tidyr (>= 1.3.0),
+    tibble (>= 3.2.0),
+    readr (>= 2.1.0),
+    stringr (>= 1.5.0),
+    purrr (>= 1.0.0),
+    rlang (>= 1.1.0),
+    Biobase (>= 2.58.0),
+    org.Hs.eg.db (>= 3.16.0),
+    AnnotationDbi (>= 1.60.0),
+    data.table (>= 1.14.0),
+    reshape2 (>= 1.4.0),
+    tools,
+    stats,
+    utils
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    BiocStyle,
+    pheatmap,
+    RColorBrewer,
+    circlize,
+    visNetwork,
+    Cairo,
+    progress (>= 1.2.0)
+VignetteBuilder: knitr
+URL: https://github.com/loganylchen/MPAGE
+BugReports: https://github.com/loganylchen/MPAGE/issues

@@ -1,5 +1,4 @@
 library(testthat)
-library(MPAGE)
+library(mpage)
 
-test_check("MPAGE")
-
+test_check("mpage")
