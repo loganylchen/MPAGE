@@ -11,7 +11,8 @@
 #' @param processed_dir Character string specifying directory path for processed data files (default: "./")
 #' @param species Character string specifying species taxonomy ID (default: "9606")
 #'
-#' @return An igraph object representing the PPI network
+#' @return A named list of igraph objects, one per data source (e.g., \code{string}, \code{biogrid}, \code{intact}).
+#'   Use \code{\link{merge_ppi_networks}} to combine them into a single network.
 #'
 #' @export
 #'

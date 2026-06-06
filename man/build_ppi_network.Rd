@@ -27,7 +27,8 @@ build_ppi_network(
 \item{species}{Character string specifying species taxonomy ID (default: "9606")}
 }
 \value{
-An igraph object representing the PPI network
+A named list of igraph objects, one per data source (e.g., \code{string}, \code{biogrid}, \code{intact}).
+  Use \code{\link{merge_ppi_networks}} to combine them into a single network.
 }
 \description{
 Construct protein-protein interaction network from multiple data sources using unified interface
